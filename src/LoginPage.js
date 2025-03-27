@@ -16,20 +16,26 @@ function LoginPage() {
 
     const role = roleNames[id] || "Bilinmeyen Rol"; // Geçerli rol varsa al, yoksa default yaz
 
+    // FIX: needs username
     const handleLogin = async () => {
         try {
-            // Send username to the backend for authentication
-            // FIX: not id but username should be sent
             const response = await axios.get(`${config.backendUrl}students/getbyid`, {
                 params: {
-                    id: 0 // Replace 0 with the actual student ID
+                    id: username,
                 }
             });
-
+    
             if (response.status === 200) {
-                alert(`${role} olarak giriş başarılı`);
-                // Optionally save the authentication token (e.g., JWT)
-                // localStorage.setItem("authToken", response.data.token);
+                // Check if the response body is empty
+                if (Object.keys(response.data).length === 0) {
+                    alert("Başarılı giriş, ancak öğrenci verisi boş.");
+                } else {
+                    // setStudent(response.data); // Save student data to state
+                    alert(`${role} olarak giriş başarılı`);
+                }
+            } else {
+                // If response status is not 200
+                alert("Giriş işlemi sırasında bir hata oluştu.");
             }
         } catch (error) {
             console.error("Login error:", error);
