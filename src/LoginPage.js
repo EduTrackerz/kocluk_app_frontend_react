@@ -1,51 +1,54 @@
 import React, { useState } from "react";
-import { useParams } from "react-router-dom";
-import axios from "axios";
-import config from "./config";
+import { useNavigate, useParams } from "react-router-dom";
+import Student from "./entities/Student";  // Import the Student class
 
 function LoginPage() {
-    const { id } = useParams(); // Get login role from URL
+    const { role } = useParams(); // Get login role from URL
     const [username, setUsername] = useState("");
+    const navigate = useNavigate();
 
-    // Türkçe çeviri için bir nesne oluşturuyoruz
     const roleNames = {
         student: "Öğrenci",
         teacher: "Öğretmen",
         admin: "Koç",
     };
+    const roleName = roleNames[role] || "Bilinmeyen Rol";
 
-    const role = roleNames[id] || "Bilinmeyen Rol"; // Geçerli rol varsa al, yoksa default yaz
-
-    // FIX: needs username
     const handleLogin = async () => {
-        try {
-            const response = await axios.get(`${config.backendUrl}students/getbyid`, {
-                params: {
-                    id: username,
+        switch (role) {
+            case "student":
+                try {
+                    // Use Student.getById to fetch the student data
+                    const student = await Student.getById(username);  // This uses the static method from Student.js
+        
+                    if (student) {
+                        // Navigate to student's main page
+                        navigate(`/student/mainPage/${student.id}`);
+                    } else {
+                        // Handle case where student is not found or an error occurred
+                        alert("Öğrenci bulunamadı.");
+                    }
+                    
+                } catch (error) {
+                    console.error("Login error:", error);
+                    alert("Giriş işlemi sırasında bir hata oluştu.");
                 }
-            });
-    
-            if (response.status === 200) {
-                // Check if the response body is empty
-                if (Object.keys(response.data).length === 0) {
-                    alert("Başarılı giriş, ancak öğrenci verisi boş.");
-                } else {
-                    // setStudent(response.data); // Save student data to state
-                    alert(`${role} olarak giriş başarılı`);
-                }
-            } else {
-                // If response status is not 200
-                alert("Giriş işlemi sırasında bir hata oluştu.");
-            }
-        } catch (error) {
-            console.error("Login error:", error);
-            alert("Giriş işlemi sırasında bir hata oluştu.");
+                break;
+            case "teacher":
+                alert("Not implemented yet.");
+                return;
+            case "admin":
+                alert("Not implemented yet.");
+                return;
+            default:
+                alert("Geçersiz bir rol ile giriş yapmaya çalışıyorsunuz.");
+                return;
         }
     };
 
     return (
         <div style={{ textAlign: "center", marginTop: "50px" }}>
-            <h2>{role} olarak giriş yap</h2>
+            <h2>{roleName} olarak giriş yap</h2>
             <input 
                 type="text" 
                 placeholder="Kullanıcı adınızı girin"
