@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, Link } from "react-router-dom";
 import Student from "./entities/Student";  // Import the Student class
 
 function LoginPage() {
@@ -55,7 +55,22 @@ function LoginPage() {
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
             />
-            <button onClick={handleLogin}>Giriş Yap</button>
+
+            {/* Login button */}
+            <button 
+                className="ml-2 px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700"
+                onClick={handleLogin}
+            >
+                Giriş Yap
+            </button>
+
+            {/* Register Button */}
+            <p className="mt-4">
+                Hesabınız yok mu?{" "}
+                <Link to="/register/student" className="text-blue-500 underline">
+                    Kayıt Ol
+                </Link>
+            </p>
         </div>
     );
 }

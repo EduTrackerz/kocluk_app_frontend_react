@@ -1,6 +1,7 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import LoginPage from "./LoginPage";
+import RegisterStudent from "./RegisterStudent";
 import StudentMainPage from "./StudentMainPage";
 
 function App() {
@@ -20,7 +21,8 @@ function App() {
 
                 <Routes>
                     <Route path="/login/:role" element={<LoginPage />} />
-                    <Route path="/student/mainPage/:id" element={<StudentMainPage />} />
+                    <Route path="/mainpage/student/:id" element={<StudentMainPage />} />
+                    <Route path="/register/student" element={<RegisterStudent />} />
                     {/* <Route path="/teacher/mainPage/:username" element={<TeacherMainPage />} /> */}
                     {/* <Route path="/admin/mainPage/:username" element={<AdminMainPage />} /> */}
                 </Routes>
