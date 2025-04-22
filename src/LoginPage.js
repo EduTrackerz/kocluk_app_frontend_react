@@ -19,7 +19,7 @@ function LoginPage() {
             case "student":
                 try {
                     // Use Student.getById to fetch the student data
-                    const student = await Student.getById(username);  // This uses the static method from Student.js
+                    const student = await Student.getByUsername(username);  // This uses the static method from Student.js
         
                     if (student) {
                         // Navigate to student's main page
