@@ -25,7 +25,7 @@ function LoginPage() {
         
                     if (student) {
                         // Navigate to student's main page
-                        navigate(`/student/mainPage/${student.id}`);
+                        navigate(`/mainpage/student/${student.id}`);
                     } else {
                         // Handle case where student is not found or an error occurred
                         alert("Öğrenci bulunamadı.");
