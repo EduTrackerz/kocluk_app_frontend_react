@@ -1,6 +1,10 @@
 import React from "react";
 import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
 import LoginPage from "./LoginPage";
+import RegisterStudent from "./registerPages/RegisterStudent";
+import RegisterTeacher from "./registerPages/RegisterTeacher";
+import RegisterAdmin from "./registerPages/RegisterAdmin";
+import StudentMainPage from "./StudentMainPage";
 
 function App() {
     return (
@@ -18,7 +22,13 @@ function App() {
                 </Link>
 
                 <Routes>
-                    <Route path="/login/:id" element={<LoginPage />} />
+                    <Route path="/login/:role" element={<LoginPage />} />
+                    <Route path="/mainpage/student/:id" element={<StudentMainPage />} />
+                    <Route path="/register/student" element={<RegisterStudent />} />
+                    <Route path="/register/admin" element={<RegisterAdmin />} />
+                    <Route path="/register/teacher" element={<RegisterTeacher />} />
+                    {/* <Route path="/teacher/mainPage/:username" element={<TeacherMainPage />} /> */}
+                    {/* <Route path="/admin/mainPage/:username" element={<AdminMainPage />} /> */}
                 </Routes>
             </div>
         </Router>
