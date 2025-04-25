@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Student from "./entities/Student";
+import Student from "../entities/Student";
 
 function RegisterStudent() {
     const [username, setUsername] = useState("");
@@ -9,7 +9,7 @@ function RegisterStudent() {
 
     const handleRegister = async () => {
         try {
-            const newStudent = await Student.register({ username, name }); // Bu metodu Student.js içinde tanımlayacağız
+            const newStudent = await Student.register({ username, name });
             if (newStudent && newStudent.id) {
                 alert("Kayıt başarılı!");
                 navigate(`/student/mainPage/${newStudent.id}`);
