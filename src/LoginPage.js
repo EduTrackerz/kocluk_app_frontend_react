@@ -60,7 +60,8 @@ function LoginPage() {
                     const admin = await Admin.getByUsername(username);  // This uses the static method from Student.js
         
                     if (admin) {
-                        // Navigate to admins's main page
+                        localStorage.setItem('role', 'admin'); // Rolü kaydet
+                        localStorage.setItem('userId', admin.id); // ID'yi kaydet
                         navigate(`/admin/mainPage/${admin.id}`);
                     } else {
                         // Handle case where student is not found or an error occurred

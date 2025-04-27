@@ -1,35 +1,49 @@
+// StudentMainPage.jsx
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
-import Student from './entities/Student'; // Import the Student class
+import Exam from './entities/Exam';
 
 function StudentMainPage() {
-    const { id } = useParams(); // Get the student ID from URL params
-    const [student, setStudent] = useState(null);
+    const { id } = useParams();
+    const [exams, setExams] = useState([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const fetchStudent = async () => {
-            const fetchedStudent = await Student.getById(id); // Fetch student using the ID
-            console.log("Fetched student on main page:", fetchedStudent);
-            setStudent(fetchedStudent);
-            setLoading(false);
+        const loadExams = async () => {
+            try {
+                const data = await Exam.getAllExams();
+                setExams(data);
+            } catch (error) {
+                console.error('Error:', error);
+            } finally {
+                setLoading(false);
+            }
         };
 
-        fetchStudent();
-    }, [id]);
+        loadExams();
+    }, []);
 
     if (loading) {
         return <div>Loading...</div>;
     }
 
-    if (!student) {
-        return <div>Student not found</div>;
-    }
-
     return (
-        <div>
-            <p>ID: {student.id}</p>
-            <h2>{student.name || "İsimsiz Öğrenci"}</h2>
+        <div className="student-container">
+            <h2>Katılabileceğin Sınavlar</h2>
+
+            {loading ? (
+                <p>Yükleniyor...</p>
+            ) : (
+                <div className="exam-list">
+                    {exams.map(exam => (
+                        <div key={exam.id} className="exam-card">
+                            <h3>{exam.name}</h3>
+                            <p>Tarih: {new Date(exam.examDate).toLocaleString()}</p>
+                            <button className="join-button">Sınava Katıl</button>
+                        </div>
+                    ))}
+                </div>
+            )}
         </div>
     );
 }

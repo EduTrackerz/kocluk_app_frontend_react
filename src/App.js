@@ -5,30 +5,40 @@ import RegisterStudent from "./registerPages/RegisterStudent";
 import RegisterTeacher from "./registerPages/RegisterTeacher";
 import RegisterAdmin from "./registerPages/RegisterAdmin";
 import StudentMainPage from "./StudentMainPage";
+import AdminMainPage from './AdminMainPage';
+import CreateExamForm from './CreateExamForm';
 
 function App() {
     return (
         <Router>
-            <div style={{ textAlign: "center", marginTop: "50px" }}>
-                <h1>Choose a Login</h1>
-                <Link to="/login/student">
-                    <button>Öğrenci</button>
-                </Link>
-                <Link to="/login/teacher">
-                    <button>Öğretmen</button>
-                </Link>
-                <Link to="/login/admin">
-                    <button>Koç</button>
-                </Link>
-
+            <div className="app-container">
                 <Routes>
+                    <Route path="/" element={
+                        <div style={{ textAlign: "center", marginTop: "50px" }}>
+                            <h1>Choose a Login</h1>
+                            <Link to="/login/student">
+                                <button>Öğrenci</button>
+                            </Link>
+                            <Link to="/login/teacher">
+                                <button>Öğretmen</button>
+                            </Link>
+                            {/* Koç butonunu direkt admin paneline yönlendir */}
+                            <Link to="/login/admin">
+                                <button>Koç</button>
+                            </Link>
+                        </div>
+                    } />
+
+                    {/* Diğer route'lar aynı kalacak */}
                     <Route path="/login/:role" element={<LoginPage />} />
-                    <Route path="/mainpage/student/:id" element={<StudentMainPage />} />
                     <Route path="/register/student" element={<RegisterStudent />} />
                     <Route path="/register/admin" element={<RegisterAdmin />} />
                     <Route path="/register/teacher" element={<RegisterTeacher />} />
-                    {/* <Route path="/teacher/mainPage/:username" element={<TeacherMainPage />} /> */}
-                    {/* <Route path="/admin/mainPage/:username" element={<AdminMainPage />} /> */}
+                    <Route path="/mainpage/student/:id" element={<StudentMainPage />} />
+
+                    <Route path="/admin/main/*" element={<AdminMainPage />}>
+                        <Route path="exam-create" element={<CreateExamForm />} />
+                    </Route>
                 </Routes>
             </div>
         </Router>
