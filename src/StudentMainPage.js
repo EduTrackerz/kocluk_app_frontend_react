@@ -44,26 +44,50 @@ function StudentMainPage() {
 
     return (
         <div className="student-container">
-            <h2>Sınav Listesi</h2>
+            <h2 className="page-title">Sinavlarin</h2>
 
-            <div className="exam-list">
+            <div className="table-container">
                 {exams.length > 0 ? (
-                    exams.map(exam => (
-                        <div key={exam.id} className="exam-card">
-                            <h3>{exam.name}</h3>
-                            <p>Tarih: {new Date(exam.examDate).toLocaleString('tr-TR')}</p>
-                            <div className="subject-counts">
-                                <span>Turkce: {exam.turkceCount}</span>
-                                <span>Matematik: {exam.matematikCount}</span>
-                                <span>Fen Bilimleri: {exam.fenCount}</span>
-                                <span>Sosyal Bilgiler: {exam.sosyalCount}</span>
-                                <span>Din Kulturu: {exam.dinCount}</span>
-                                <span>Yabancı Dil: {exam.yabanciCount}</span>
-                            </div>
-                        </div>
-                    ))
+                    <table className="exam-table">
+                        <thead>
+                            <tr>
+                                <th>Sınav Adı</th>
+                                <th>Tarih & Saat</th>
+                                <th>Türkçe</th>
+                                <th>Matematik</th>
+                                <th>Fen</th>
+                                <th>Sosyal</th>
+                                <th>Din K.</th>
+                                <th>Yabancı Dil</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {exams.map(exam => (
+                                <tr key={exam.id} className="exam-row">
+                                    <td className="exam-name">{exam.name}</td>
+                                    <td className="exam-date">
+                                        {new Date(exam.examDate).toLocaleDateString('tr-TR', {
+                                            day: 'numeric',
+                                            month: 'short',
+                                            year: 'numeric',
+                                            hour: '2-digit',
+                                            minute: '2-digit'
+                                        })}
+                                    </td>
+                                    <td className="subject-count turkce">{exam.turkceCount}</td>
+                                    <td className="subject-count matematik">{exam.matematikCount}</td>
+                                    <td className="subject-count fen">{exam.fenCount}</td>
+                                    <td className="subject-count sosyal">{exam.sosyalCount}</td>
+                                    <td className="subject-count din">{exam.dinCount}</td>
+                                    <td className="subject-count yabanci">{exam.yabanciCount}</td>
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
                 ) : (
-                    <p>Görüntülenecek sınav bulunamadı</p>
+                    <div className="empty-state">
+                        📭 Henüz planlanmış sınav bulunmamaktadır
+                    </div>
                 )}
             </div>
         </div>

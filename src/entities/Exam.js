@@ -26,7 +26,7 @@ export default class Exam {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
-                    'role': role.toLowerCase // Rol bilgisini header'a ekle
+                    'role': role // Rol bilgisini header'a ekle
                 },
                 credentials: 'include'
             });

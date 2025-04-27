@@ -1,5 +1,5 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route, Link } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, Link, Navigate } from "react-router-dom";
 import LoginPage from "./LoginPage";
 import RegisterStudent from "./registerPages/RegisterStudent";
 import RegisterTeacher from "./registerPages/RegisterTeacher";
@@ -7,6 +7,11 @@ import RegisterAdmin from "./registerPages/RegisterAdmin";
 import StudentMainPage from "./StudentMainPage";
 import AdminMainPage from './AdminMainPage';
 import CreateExamForm from './CreateExamForm';
+
+const testAdmin = {
+    id: "test-admin-123",
+    role: "admin"
+};
 
 function App() {
     return (
@@ -25,6 +30,10 @@ function App() {
                             <Link to="/login/admin">
                                 <button>Yönetici</button>
                             </Link>
+                            {/* Test için doğrudan admin paneline giriş butonu */}
+                            <Link to="/mainPage/admin/test-admin-123">
+                                <button style={{ background: "#f59e0b", color: "white" }}>TEST: Doğrudan Admin Paneli</button>
+                            </Link>
                         </div>
                     } />
 
@@ -35,7 +44,11 @@ function App() {
 
                     <Route path="/mainpage/student/:id" element={<StudentMainPage />} />
 
-                    <Route path="/mainPage/admin/:id" element={<AdminMainPage />}>
+                    <Route path="/mainPage/admin/:id" element={
+                        localStorage.getItem('role') === 'admin' || testAdmin.id === 'test-admin-123'
+                            ? <AdminMainPage />
+                            : <Navigate to="/login/admin" />
+                    }>
                         <Route path="exam-create" element={<CreateExamForm />} />
                     </Route>
                 </Routes>
