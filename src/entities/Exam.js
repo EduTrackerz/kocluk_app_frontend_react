@@ -1,4 +1,4 @@
-// entities/Exam.js
+ï»¿// entities/Exam.js
 import config from '../config';
 
 export default class Exam {
@@ -13,31 +13,31 @@ export default class Exam {
             body: JSON.stringify(examData)
         });
 
-        if (!response.ok) throw new Error('Sýnav oluþturma baþarýsýz');
+        if (!response.ok) throw new Error('SÄ±nav oluÅŸturma baÅŸarÄ±sÄ±z');
         return await response.json();
     }
 
     static async getAllExams() {
         try {
             const role = localStorage.getItem('role');
-            if (!role) throw new Error('Yetkilendirme hatasý: Rol bilgisi yok');
+            if (!role) throw new Error('Yetkilendirme hatasÄ±: Rol bilgisi yok');
 
             const response = await fetch(`${config.backendUrl}/api/exams/all`, {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Role': role.toLowerCase // Rol bilgisini header'a ekle
+                    'role': role.toLowerCase // Rol bilgisini header'a ekle
                 },
                 credentials: 'include'
             });
 
             if (!response.ok) {
                 const errorData = await response.json();
-                throw new Error(errorData.message || 'Sýnavlar getirilemedi');
+                throw new Error(errorData.message || 'SÄ±navlar getirilemedi');
             }
             return await response.json();
         } catch (error) {
-            console.error('Sýnavlarý getirme hatasý:', error);
+            console.error('SÄ±navlarÄ± getirme hatasÄ±:', error);
             throw error;
         }
     }
