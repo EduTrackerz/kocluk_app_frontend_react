@@ -24,7 +24,7 @@ function LoginPage() {
                     const student = await Student.getByUsername(username);  // This uses the static method from Student.js
         
                     if (student) {
-                        localStorage.setItem('role', 'admin'); // Rolü kaydet
+                        localStorage.setItem('role', 'student'); // Rolü kaydet
                         localStorage.setItem('userId', student.id); // ID'yi kaydet
                         // Navigate to student's main page
                         navigate(`/mainpage/student/${student.id}`);
@@ -44,7 +44,7 @@ function LoginPage() {
                     const teacher = await Teacher.getByUsername(username);  // This uses the static method from Student.js
         
                     if (teacher) {
-                        localStorage.setItem('role', 'admin'); // Rolü kaydet
+                        localStorage.setItem('role', 'teacher'); // Rolü kaydet
                         localStorage.setItem('userId', teacher.id); // ID'yi kaydet
                         // Navigate to teachers's main page
                         navigate(`/teacher/mainPage/${teacher.id}`);
