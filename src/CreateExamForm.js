@@ -51,10 +51,10 @@ const CreateExamForm = () => {
             };
 
             await Exam.createExam(examData);
-            navigate('/admin/main', { state: { success: true } });
+            navigate('/admin/main', { state: { success: true, refresh: true } });
         } catch (error) {
-            console.error('Submission error:', error);
-            setErrors({ submit: 'Sinav olusturulamadý. Lütfen tekrar deneyin.' });
+            //console.error('Submission error:', error);
+            //setErrors({ submit: 'Sinav olusturulamadý. Lütfen tekrar deneyin.' });
         } finally {
             setIsSubmitting(false);
         }
