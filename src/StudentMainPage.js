@@ -1,49 +1,68 @@
 // StudentMainPage.jsx
 import React, { useEffect, useState } from 'react';
-import { useParams } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import Exam from './entities/Exam';
 
 function StudentMainPage() {
     const { id } = useParams();
+    const navigate = useNavigate();
     const [exams, setExams] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState(null);
 
     useEffect(() => {
-        const loadExams = async () => {
+        const checkAuthAndLoadExams = async () => {
             try {
-                const data = await Exam.getAllExams();
-                setExams(data);
-            } catch (error) {
-                console.error('Error:', error);
+                const role = localStorage.getItem('role');
+
+                // Sadece student veya admin rolüne izin ver
+                if (role !== 'student' && role !== 'admin') {
+                    navigate('/login');
+                    return;
+                }
+
+                const examsData = await Exam.getAllExams();
+                setExams(examsData);
+            } catch (err) {
+                console.error('Hata:', err);
+                setError(err.message);
+
+                // 401 Unauthorized hatası durumunda login sayfasına yönlendir
+                if (err.message.includes('401')) {
+                    navigate('/login');
+                }
             } finally {
                 setLoading(false);
             }
         };
 
-        loadExams();
-    }, []);
+        checkAuthAndLoadExams();
+    }, [id, navigate]);
 
-    if (loading) {
-        return <div>Loading...</div>;
-    }
+    if (loading) return <div>Yükleniyor...</div>;
+    if (error) return <div className="error-message">Hata: {error}</div>;
 
     return (
         <div className="student-container">
-            <h2>Katılabileceğin Sınavlar</h2>
+            <h2>Sınav Listesi</h2>
 
-            {loading ? (
-                <p>Yükleniyor...</p>
-            ) : (
-                <div className="exam-list">
-                    {exams.map(exam => (
+            <div className="exam-list">
+                {exams.length > 0 ? (
+                    exams.map(exam => (
                         <div key={exam.id} className="exam-card">
                             <h3>{exam.name}</h3>
-                            <p>Tarih: {new Date(exam.examDate).toLocaleString()}</p>
-                            <button className="join-button">Sınava Katıl</button>
+                            <p>Tarih: {new Date(exam.examDate).toLocaleString('tr-TR')}</p>
+                            <div className="subject-counts">
+                                <span>Türkçe: {exam.turkceCount}</span>
+                                <span>Matematik: {exam.matematikCount}</span>
+                                <span>Fen: {exam.fenCount}</span>
+                            </div>
                         </div>
-                    ))}
-                </div>
-            )}
+                    ))
+                ) : (
+                    <p>Görüntülenecek sınav bulunamadı</p>
+                )}
+            </div>
         </div>
     );
 }

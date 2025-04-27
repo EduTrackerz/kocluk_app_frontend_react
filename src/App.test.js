@@ -12,7 +12,7 @@ test('Ana sayfada login butonlarýný gösterir', () => {
 
     expect(screen.getByText(/Öðrenci/i)).toBeInTheDocument();
     expect(screen.getByText(/Öðretmen/i)).toBeInTheDocument();
-    expect(screen.getByText(/Koç/i)).toBeInTheDocument();
+    expect(screen.getByText(/Yönetici/i)).toBeInTheDocument();
 });
 
 // Admin paneli testi

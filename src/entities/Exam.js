@@ -18,14 +18,28 @@ export default class Exam {
     }
 
     static async getAllExams() {
-        const role = localStorage.getItem('role');
-        const response = await fetch(`${config.backendUrl}/api/exams/all`, {
-            headers: {
-                'role': role
-            }
-        });
+        try {
+            const role = localStorage.getItem('role');
+            if (!role) throw new Error('Yetkilendirme hatasý: Rol bilgisi yok');
 
-        if (!response.ok) throw new Error('Sýnavlar getirilemedi');
-        return await response.json();
+            const response = await fetch(`${config.backendUrl}/api/exams/all`, {
+                method: 'GET',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${localStorage.getItem('token')}`, // JWT kullanýyorsanýz
+                    'role': role // Rol bilgisini header'a ekle
+                },
+                credentials: 'include'
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.message || 'Sýnavlar getirilemedi');
+            }
+            return await response.json();
+        } catch (error) {
+            console.error('Sýnavlarý getirme hatasý:', error);
+            throw error;
+        }
     }
 }

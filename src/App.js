@@ -15,28 +15,27 @@ function App() {
                 <Routes>
                     <Route path="/" element={
                         <div style={{ textAlign: "center", marginTop: "50px" }}>
-                            <h1>Choose a Login</h1>
+                            <h1>Giriş Türünü Seçin</h1>
                             <Link to="/login/student">
                                 <button>Öğrenci</button>
                             </Link>
                             <Link to="/login/teacher">
                                 <button>Öğretmen</button>
                             </Link>
-                            {/* Koç butonunu direkt admin paneline yönlendir */}
                             <Link to="/login/admin">
-                                <button>Koç</button>
+                                <button>Yönetici</button>
                             </Link>
                         </div>
                     } />
 
-                    {/* Diğer route'lar aynı kalacak */}
                     <Route path="/login/:role" element={<LoginPage />} />
                     <Route path="/register/student" element={<RegisterStudent />} />
                     <Route path="/register/admin" element={<RegisterAdmin />} />
                     <Route path="/register/teacher" element={<RegisterTeacher />} />
+
                     <Route path="/mainpage/student/:id" element={<StudentMainPage />} />
 
-                    <Route path="/admin/main/*" element={<AdminMainPage />}>
+                    <Route path="/mainPage/admin/:id" element={<AdminMainPage />}>
                         <Route path="exam-create" element={<CreateExamForm />} />
                     </Route>
                 </Routes>

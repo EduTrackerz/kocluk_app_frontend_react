@@ -12,7 +12,7 @@ function LoginPage() {
     const roleNames = {
         student: "Öğrenci",
         teacher: "Öğretmen",
-        admin: "Koç",
+        admin: "Yönetici",
     };
     const roleName = roleNames[role] || "Bilinmeyen Rol";
 
@@ -24,6 +24,8 @@ function LoginPage() {
                     const student = await Student.getByUsername(username);  // This uses the static method from Student.js
         
                     if (student) {
+                        localStorage.setItem('role', 'admin'); // Rolü kaydet
+                        localStorage.setItem('userId', admin.id); // ID'yi kaydet
                         // Navigate to student's main page
                         navigate(`/mainpage/student/${student.id}`);
                     } else {
@@ -38,6 +40,8 @@ function LoginPage() {
                 break;
             case "teacher":
                 try {
+                    localStorage.setItem('role', 'admin'); // Rolü kaydet
+                    localStorage.setItem('userId', admin.id); // ID'yi kaydet
                     // Use Student.getById to fetch the student data
                     const teacher = await Teacher.getByUsername(username);  // This uses the static method from Student.js
         
@@ -62,7 +66,7 @@ function LoginPage() {
                     if (admin) {
                         localStorage.setItem('role', 'admin'); // Rolü kaydet
                         localStorage.setItem('userId', admin.id); // ID'yi kaydet
-                        navigate(`/admin/mainPage/${admin.id}`);
+                        navigate(`/mainPage/admin/${admin.id}`);
                     } else {
                         // Handle case where student is not found or an error occurred
                         alert("Yönetici bilgileri bulunamadı.");

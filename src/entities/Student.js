@@ -41,11 +41,15 @@ class Student {
 
     // Private method to fetch student data and map it
     static async fetchStudent(endpoint, params) {
+        console.log("Fetching student from:", `${config.backendUrl}${endpoint}`);
+        console.log("With params:", params);
         try {
             const response = await axios.get(`${config.backendUrl}${endpoint}`, { params });
+            console.log("Raw API response:", response);
             return this.mapResponseToStudent(response);
         } catch (error) {
             console.error(`Error while fetching student from ${endpoint}:`, error);
+            console.error("Error details:", error.response?.data || error.message);
             return null;
         }
     }
