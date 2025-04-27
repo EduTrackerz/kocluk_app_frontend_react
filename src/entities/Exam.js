@@ -26,8 +26,7 @@ export default class Exam {
                 method: 'GET',
                 headers: {
                     'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${localStorage.getItem('token')}`, // JWT kullanýyorsanýz
-                    'role': role.toLowerCase // Rol bilgisini header'a ekle
+                    'Role': role.toLowerCase // Rol bilgisini header'a ekle
                 },
                 credentials: 'include'
             });

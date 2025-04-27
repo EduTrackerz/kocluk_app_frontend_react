@@ -53,9 +53,12 @@ function StudentMainPage() {
                             <h3>{exam.name}</h3>
                             <p>Tarih: {new Date(exam.examDate).toLocaleString('tr-TR')}</p>
                             <div className="subject-counts">
-                                <span>Türkçe: {exam.turkceCount}</span>
+                                <span>Turkce: {exam.turkceCount}</span>
                                 <span>Matematik: {exam.matematikCount}</span>
-                                <span>Fen: {exam.fenCount}</span>
+                                <span>Fen Bilimleri: {exam.fenCount}</span>
+                                <span>Sosyal Bilgiler: {exam.sosyalCount}</span>
+                                <span>Din Kulturu: {exam.dinCount}</span>
+                                <span>Yabancı Dil: {exam.yabanciCount}</span>
                             </div>
                         </div>
                     ))
