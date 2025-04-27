@@ -25,7 +25,7 @@ function LoginPage() {
         
                     if (student) {
                         localStorage.setItem('role', 'admin'); // Rolü kaydet
-                        localStorage.setItem('userId', admin.id); // ID'yi kaydet
+                        localStorage.setItem('userId', student.id); // ID'yi kaydet
                         // Navigate to student's main page
                         navigate(`/mainpage/student/${student.id}`);
                     } else {
@@ -40,12 +40,12 @@ function LoginPage() {
                 break;
             case "teacher":
                 try {
-                    localStorage.setItem('role', 'admin'); // Rolü kaydet
-                    localStorage.setItem('userId', admin.id); // ID'yi kaydet
                     // Use Student.getById to fetch the student data
                     const teacher = await Teacher.getByUsername(username);  // This uses the static method from Student.js
         
                     if (teacher) {
+                        localStorage.setItem('role', 'admin'); // Rolü kaydet
+                        localStorage.setItem('userId', teacher.id); // ID'yi kaydet
                         // Navigate to teachers's main page
                         navigate(`/teacher/mainPage/${teacher.id}`);
                     } else {
