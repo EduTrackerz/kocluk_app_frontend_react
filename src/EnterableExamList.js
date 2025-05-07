@@ -14,9 +14,15 @@ const EnterableExamList = ({ studentId }) => {
             if (MOCK_MODE) {
                 const mockExams = [
                     {
-                        id: 101,
-                        name: "LGS Deneme 2",
-                        examDate: new Date().toISOString()
+                        id: 2, // ✅ veritabanındaki gerçek sınav ID'si
+                        name: "Mayıs Ayı Denemesi",
+                        examDate: "2025-05-07T10:00:00", // tarih formatı önemli değil, ISO ya da Date kabul eder
+                        turkceCount: 40,
+                        matematikCount: 40,
+                        fenCount: 20,
+                        sosyalCount: 20,
+                        dinCount: 10,
+                        yabanciCount: 10
                     }
                 ];
                 setExams(mockExams);

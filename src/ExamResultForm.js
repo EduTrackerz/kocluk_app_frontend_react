@@ -1,7 +1,7 @@
 ﻿import React, { useState } from 'react';
 import config from './config';
 
-const MOCK_MODE = true;
+const MOCK_MODE = false;
 
 const ExamResultForm = ({ exam, studentId, onBack }) => {
     const subjects = [
@@ -19,7 +19,6 @@ const ExamResultForm = ({ exam, studentId, onBack }) => {
             [`${key}Wrong`, 0]
         ]))
     );
-
     const [statusMessage, setStatusMessage] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -39,11 +38,20 @@ const ExamResultForm = ({ exam, studentId, onBack }) => {
         if (isInvalid) return;
 
         setIsSubmitting(true);
+
         const payload = {
+            id: {
+                studentId: parseInt(studentId),
+                examId: exam.id
+            },
             student: { id: parseInt(studentId) },
-            exam: { id: exam.id },
-            ...formData
+            exam: { id: exam.id }
         };
+
+        subjects.forEach(({ key }) => {
+            payload[`${key}Correct`] = formData[`${key}Correct`];
+            payload[`${key}Wrong`] = formData[`${key}Wrong`];
+        });
 
         try {
             if (MOCK_MODE) {
@@ -51,7 +59,7 @@ const ExamResultForm = ({ exam, studentId, onBack }) => {
                 await new Promise((res) => setTimeout(res, 1000));
                 setStatusMessage("✅ Sınav sonucu başarıyla kaydedildi (mock).");
             } else {
-                const response = await fetch(`${config.backendUrl}/api/exam-result/add`, {
+                const response = await fetch(`${config.backendUrl}/api/exam-results/add`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify(payload)
@@ -84,26 +92,24 @@ const ExamResultForm = ({ exam, studentId, onBack }) => {
 
                     return (
                         <div key={key} className="form-row">
-                            <label className="form-label">
-                                {name} ({max} soru):
-                            </label>
-                            <div className="input-group">
+                            <label className="form-label">{name} ({max} soru):</label>
+                            <div className="input-pair">
                                 <input
                                     type="number"
                                     name={`${key}Correct`}
                                     value={correct}
                                     onChange={handleChange}
                                     min="0"
+                                    className="form-input"
                                 />
                                 <span>Doğru</span>
-                            </div>
-                            <div className="input-group">
                                 <input
                                     type="number"
                                     name={`${key}Wrong`}
                                     value={wrong}
                                     onChange={handleChange}
                                     min="0"
+                                    className="form-input"
                                 />
                                 <span>Yanlış</span>
                             </div>
@@ -115,7 +121,6 @@ const ExamResultForm = ({ exam, studentId, onBack }) => {
                         </div>
                     );
                 })}
-
                 <div className="form-actions">
                     <button type="submit" disabled={isSubmitting || isInvalid}>
                         {isSubmitting ? "Gönderiliyor..." : "Kaydet"}
