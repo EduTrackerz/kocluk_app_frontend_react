@@ -14,9 +14,9 @@ const EnterableExamList = ({ studentId }) => {
             if (MOCK_MODE) {
                 const mockExams = [
                     {
-                        id: 2, // ✅ veritabanındaki gerçek sınav ID'si
+                        id: 2,
                         name: "Mayıs Ayı Denemesi",
-                        examDate: "2025-05-07T10:00:00", // tarih formatı önemli değil, ISO ya da Date kabul eder
+                        examDate: "2025-05-07T10:00:00",
                         turkceCount: 40,
                         matematikCount: 40,
                         fenCount: 20,
@@ -75,17 +75,24 @@ const EnterableExamList = ({ studentId }) => {
                         </tr>
                     </thead>
                     <tbody>
-                        {exams.map((exam) => (
-                            <tr key={exam.id}>
-                                <td>{exam.name}</td>
-                                <td>{new Date(exam.examDate).toLocaleString("tr-TR")}</td>
-                                <td>
-                                    <button onClick={() => setSelectedExam(exam)}>
-                                        Sınava Gir
-                                    </button>
-                                </td>
-                            </tr>
-                        ))}
+                        {exams.map((exam) => {
+                            const isPastExam = new Date(exam.examDate) < new Date();
+                            return (
+                                <tr key={exam.id}>
+                                    <td>{exam.name}</td>
+                                    <td>{new Date(exam.examDate).toLocaleString("tr-TR")}</td>
+                                    <td>
+                                        {isPastExam ? (
+                                            <button onClick={() => setSelectedExam(exam)}>
+                                                Sınava Gir
+                                            </button>
+                                        ) : (
+                                            <span>Henüz zamanı gelmedi</span>
+                                        )}
+                                    </td>
+                                </tr>
+                            );
+                        })}
                     </tbody>
                 </table>
             )}
