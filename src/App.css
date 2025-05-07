@@ -1,20 +1,37 @@
 
-/* === ROOT DEÐERLERÝ === */
+/* === ROOT DEï¿½ERLERï¿½ === */
 :root {
+    /* === Current Theme === */
     --primary-color: #3b82f6;
     --secondary-color: #2563eb;
-    --background-light: #f8fafc;
+    --background-light: #f4fafb;
     --border-color: #e2e8f0;
     --text-dark: #1e293b;
     --text-light: #64748b;
     --error-color: #dc2626;
     --success-color: #16a34a;
+
+    /* === Subject Colors === */
     --turkce-color: #3b82f6;
     --matematik-color: #10b981;
     --fen-color: #f59e0b;
     --sosyal-color: #8b5cf6;
     --din-color: #ef4444;
     --yabanci-color: #06b6d4;
+
+    /* === RealTimeColors Theme === */
+    --rtc-bg: #f4fafb;
+    --rtc-text: #071114;
+    --rtc-primary: #79bbc8;
+    --rtc-secondary: #d79784;
+    --rtc-accent: #e6c756;
+    --rtc-font: 'Inter', sans-serif;
+}
+
+.rtc-theme {
+    background-color: var(--rtc-bg);
+    color: var(--rtc-text);
+    font-family: var(--rtc-font);
 }
 
 body, .App {
@@ -26,14 +43,29 @@ body, .App {
 }
 
 button {
-    font-size: 16px;
-    transition: all 0.2s ease;
-    cursor: pointer;
+    background: var(--rtc-primary);
+    color: var(--rtc-text);
+    border: none;
+    border-radius: 10px;
+    padding: 0.75rem 1.5rem;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    margin: 0rem 0.1rem;
+}  
+
+button:hover {
+    filter: brightness(0.90);
 }
 
-    button:hover {
-        filter: brightness(0.95);
-    }
+input, select, textarea {
+    padding: 0.75rem 1rem;
+    border: 2px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 16px;
+    font-family: var(--rtc-font), sans-serif;
+    background-color: #fff;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}  
 
 .page-wrapper {
     max-width: 900px;

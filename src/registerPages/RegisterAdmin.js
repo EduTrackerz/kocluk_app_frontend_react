@@ -12,7 +12,7 @@ function RegisterAdmin() {
             const newAdmin = await Admin.register({ username, name });
             if (newAdmin && newAdmin.id) {
                 alert("Kayıt başarılı!");
-                navigate(`/admin/mainPage/${newAdmin.id}`);
+                navigate(`/mainpage/admin/${newAdmin.id}`);
             } else {
                 alert("Kayıt sırasında bir hata oluştu.");
             }

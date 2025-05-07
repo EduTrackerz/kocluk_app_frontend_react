@@ -1,0 +1,28 @@
+.top-bar {
+  background-color: rgba(121, 187, 200, 0.15); /* Slight tint using RTC primary */
+  padding: 1rem 1rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(6px);
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+}
+
+.top-bar-content {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.logo {
+  width: 3rem;
+  height: rem;
+}
+
+.title {
+  font-size: 30px;
+  font-weight: 600;
+  color: var(--rtc-text);
+  text-decoration: none;
+  font-family: var(--rtc-font);
+}

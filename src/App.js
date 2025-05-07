@@ -7,6 +7,7 @@ import RegisterAdmin from "./registerPages/RegisterAdmin";
 import StudentMainPage from "./StudentMainPage";
 import AdminMainPage from './AdminMainPage';
 import CreateExamForm from './CreateExamForm';
+import Header from './theme/Header';
 
 const testAdmin = {
     id: "test-admin-123",
@@ -17,6 +18,7 @@ function App() {
     return (
         <Router>
             <div className="app-container">
+                <Header />
                 <Routes>
                     <Route path="/" element={
                         <div style={{ textAlign: "center", marginTop: "50px" }}>
@@ -53,6 +55,9 @@ function App() {
                     </Route>
                 </Routes>
             </div>
+
+            <link href="https://fonts.googleapis.com/css2?family=Inter&display=swap" rel="stylesheet" />
+
         </Router>
     );
 }

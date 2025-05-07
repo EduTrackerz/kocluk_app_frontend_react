@@ -12,7 +12,7 @@ function RegisterStudent() {
             const newStudent = await Student.register({ username, name });
             if (newStudent && newStudent.id) {
                 alert("Kayıt başarılı!");
-                navigate(`/student/mainPage/${newStudent.id}`);
+                navigate(`/mainPage/student/${newStudent.id}`);
             } else {
                 alert("Kayıt sırasında bir hata oluştu.");
             }
