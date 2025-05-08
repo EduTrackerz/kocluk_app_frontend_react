@@ -9,7 +9,7 @@ function StudentMainPage() {
     const [activeTab, setActiveTab] = useState("enterable");
 
     return (
-        <div className="page-wrapper">
+        <div className="page-wrapper slide-fade-in">
             <h2 className="page-title">📚 Öğrenci Paneli</h2>
 
             <div className="tab-buttons">
