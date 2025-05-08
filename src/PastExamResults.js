@@ -57,55 +57,53 @@ const PastExamResults = ({ studentId }) => {
 
     return (
         <div className="past-exam-results">
-            <h3>📊 Geçmiş Sınav Sonuçlarınız</h3>
+            <h2>📊 Geçmiş Sınav Sonuçlarınız</h2>
 
             {results.length === 0 ? (
                 <p>📭 Henüz sonuç girdiğiniz sınav bulunmamaktadır.</p>
             ) : (
-                <div className="table-container">
-                    <table className="exam-table">
-                        <thead>
-                            <tr>
-                                <th>Sınav</th>
-                                <th>Tarih</th>
-                                <th>Türkçe</th>
-                                <th>Matematik</th>
-                                <th>Fen</th>
-                                <th>Sosyal</th>
-                                <th>Din</th>
-                                <th>Yabancı</th>
-                                <th>Toplam Net</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {results.map((res, i) => {
-                                const netler = [
-                                    calcNet(res.turkceCorrect, res.turkceWrong),
-                                    calcNet(res.matematikCorrect, res.matematikWrong),
-                                    calcNet(res.fenCorrect, res.fenWrong),
-                                    calcNet(res.sosyalCorrect, res.sosyalWrong),
-                                    calcNet(res.dinCorrect, res.dinWrong),
-                                    calcNet(res.yabanciCorrect, res.yabanciWrong)
-                                ];
-                                const totalNet = netler.reduce((acc, net) => acc + parseFloat(net), 0).toFixed(2);
+                <table className="exam-table">
+                    <thead>
+                        <tr>
+                            <th>Sınav</th>
+                            <th>Tarih</th>
+                            <th>Türkçe</th>
+                            <th>Matematik</th>
+                            <th>Fen</th>
+                            <th>Sosyal</th>
+                            <th>Din</th>
+                            <th>Yabancı</th>
+                            <th>Toplam Net</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {results.map((res, i) => {
+                            const netler = [
+                                calcNet(res.turkceCorrect, res.turkceWrong),
+                                calcNet(res.matematikCorrect, res.matematikWrong),
+                                calcNet(res.fenCorrect, res.fenWrong),
+                                calcNet(res.sosyalCorrect, res.sosyalWrong),
+                                calcNet(res.dinCorrect, res.dinWrong),
+                                calcNet(res.yabanciCorrect, res.yabanciWrong)
+                            ];
+                            const totalNet = netler.reduce((acc, net) => acc + parseFloat(net), 0).toFixed(2);
 
-                                return (
-                                    <tr key={i}>
-                                        <td>{res.exam?.name || "-"}</td>
-                                        <td>{new Date(res.exam?.examDate).toLocaleString('tr-TR')}</td>
-                                        <td style={getNetClass(netler[0])}>{res.turkceCorrect}/{res.turkceWrong} ({netler[0]})</td>
-                                        <td style={getNetClass(netler[1])}>{res.matematikCorrect}/{res.matematikWrong} ({netler[1]})</td>
-                                        <td style={getNetClass(netler[2])}>{res.fenCorrect}/{res.fenWrong} ({netler[2]})</td>
-                                        <td style={getNetClass(netler[3])}>{res.sosyalCorrect}/{res.sosyalWrong} ({netler[3]})</td>
-                                        <td style={getNetClass(netler[4])}>{res.dinCorrect}/{res.dinWrong} ({netler[4]})</td>
-                                        <td style={getNetClass(netler[5])}>{res.yabanciCorrect}/{res.yabanciWrong} ({netler[5]})</td>
-                                        <td style={getNetClass(totalNet)}><b>{totalNet}</b></td>
-                                    </tr>
-                                );
-                            })}
-                        </tbody>
-                    </table>
-                </div>
+                            return (
+                                <tr key={i}>
+                                    <td>{res.exam?.name || "-"}</td>
+                                    <td>{new Date(res.exam?.examDate).toLocaleString('tr-TR')}</td>
+                                    <td style={getNetClass(netler[0])}>{res.turkceCorrect}/{res.turkceWrong} ({netler[0]})</td>
+                                    <td style={getNetClass(netler[1])}>{res.matematikCorrect}/{res.matematikWrong} ({netler[1]})</td>
+                                    <td style={getNetClass(netler[2])}>{res.fenCorrect}/{res.fenWrong} ({netler[2]})</td>
+                                    <td style={getNetClass(netler[3])}>{res.sosyalCorrect}/{res.sosyalWrong} ({netler[3]})</td>
+                                    <td style={getNetClass(netler[4])}>{res.dinCorrect}/{res.dinWrong} ({netler[4]})</td>
+                                    <td style={getNetClass(netler[5])}>{res.yabanciCorrect}/{res.yabanciWrong} ({netler[5]})</td>
+                                    <td style={getNetClass(totalNet)}><b>{totalNet}</b></td>
+                                </tr>
+                            );
+                        })}
+                    </tbody>
+                </table>
             )}
         </div>
     );
