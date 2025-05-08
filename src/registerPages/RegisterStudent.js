@@ -23,7 +23,8 @@ function RegisterStudent() {
     };
 
     return (
-        <div className="text-center mt-20">
+        // <div className="text-center mt-20">
+        <div style={{ textAlign: "center", marginTop: "50px" }}>
             <h2 className="text-2xl font-bold mb-4">Öğrenci Kayıt</h2>
             <input
                 className="border rounded px-3 py-2 mb-2"
