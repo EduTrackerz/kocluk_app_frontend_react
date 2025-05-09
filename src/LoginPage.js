@@ -84,7 +84,7 @@ function LoginPage() {
     };
 
     return (
-        <div style={{ textAlign: "center", marginTop: "50px" }}>
+        <div class="page-wrapper slide-fade-in" style={{ textAlign: "center", marginTop: "50px" }}>
             <h2>{roleName} olarak giriş yap</h2>
             <input 
                 type="text" 

@@ -6,7 +6,7 @@ const PastExamResults = ({ studentId }) => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState(null);
 
-    const MOCK_MODE = true;
+    const MOCK_MODE = false;
 
     useEffect(() => {
         const fetchResults = async () => {
@@ -91,7 +91,7 @@ const PastExamResults = ({ studentId }) => {
                             return (
                                 <tr key={i}>
                                     <td>{res.exam?.name || "-"}</td>
-                                    <td>{new Date(res.exam?.examDate).toLocaleString('tr-TR')}</td>
+                                    <td>{new Date(res.examDate).toLocaleString("tr-TR")}</td>
                                     <td style={getNetClass(netler[0])}>{res.turkceCorrect}/{res.turkceWrong} ({netler[0]})</td>
                                     <td style={getNetClass(netler[1])}>{res.matematikCorrect}/{res.matematikWrong} ({netler[1]})</td>
                                     <td style={getNetClass(netler[2])}>{res.fenCorrect}/{res.fenWrong} ({netler[2]})</td>

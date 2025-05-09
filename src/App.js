@@ -21,21 +21,19 @@ function App() {
                 <Header />
                 <Routes>
                     <Route path="/" element={
-                        <div style={{ textAlign: "center", marginTop: "50px" }}>
-                            <h1>Giriş Türünü Seçin</h1>
-                            <Link to="/login/student">
-                                <button>Öğrenci</button>
-                            </Link>
-                            <Link to="/login/teacher">
-                                <button>Öğretmen</button>
-                            </Link>
-                            <Link to="/login/admin">
-                                <button>Yönetici</button>
-                            </Link>
-                            {/* Test için doğrudan admin paneline giriş butonu */}
-                            <Link to="/mainPage/admin/test-admin-123">
-                                <button style={{ background: "#f59e0b", color: "white" }}>TEST: Doğrudan Admin Paneli</button>
-                            </Link>
+                        <div class="page-wrapper slide-fade-in" style={{ textAlign: "center", marginTop: "50px" }}>
+                            <div style={{ textAlign: "center", marginTop: "50px" }}>
+                                <h1>Giriş Türünü Seçin</h1>
+                                <Link to="/login/student">
+                                    <button>Öğrenci</button>
+                                </Link>
+                                <Link to="/login/teacher">
+                                    <button>Öğretmen</button>
+                                </Link>
+                                <Link to="/login/admin">
+                                    <button>Yönetici</button>
+                                </Link>
+                            </div>
                         </div>
                     } />
 

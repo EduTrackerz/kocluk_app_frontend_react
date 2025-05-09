@@ -2,7 +2,7 @@
 import ExamResultForm from './ExamResultForm';
 import config from './config';
 
-const MOCK_MODE = true;
+const MOCK_MODE = false;
 
 const EnterableExamList = ({ studentId }) => {
     const [exams, setExams] = useState([]);
