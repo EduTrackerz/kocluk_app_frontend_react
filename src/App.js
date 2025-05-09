@@ -32,10 +32,6 @@ function App() {
                             <Link to="/login/admin">
                                 <button>Yönetici</button>
                             </Link>
-                            {/* Test için doğrudan admin paneline giriş butonu */}
-                            <Link to="/mainPage/admin/test-admin-123">
-                                <button style={{ background: "#f59e0b", color: "white" }}>TEST: Doğrudan Admin Paneli</button>
-                            </Link>
                         </div>
                     } />
 
