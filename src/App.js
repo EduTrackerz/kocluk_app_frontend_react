@@ -32,6 +32,10 @@ function App() {
                             <Link to="/login/admin">
                                 <button>Yönetici</button>
                             </Link>
+                            {/* Test için doğrudan admin paneline giriş butonu */}
+                            <Link to="/mainPage/admin/test-admin-123">
+                                <button style={{ background: "#f59e0b", color: "white" }}>TEST: Doğrudan Admin Paneli</button>
+                            </Link>
                         </div>
                     } />
 
@@ -41,6 +45,14 @@ function App() {
                     <Route path="/register/teacher" element={<RegisterTeacher />} />
 
                     <Route path="/mainpage/student/:id" element={<StudentMainPage />} />
+
+                    <Route path="/mainPage/admin/:id" element={
+                        localStorage.getItem('role') === 'admin' || testAdmin.id === 'test-admin-123'
+                            ? <AdminMainPage />
+                            : <Navigate to="/login/admin" />
+                    }>
+                        <Route path="exam-create" element={<CreateExamForm />} />
+                    </Route>
                 </Routes>
             </div>
 
