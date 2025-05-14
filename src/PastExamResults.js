@@ -55,6 +55,10 @@ const PastExamResults = ({ studentId }) => {
     if (loading) return <p>⏳ Yükleniyor...</p>;
     if (error) return <p className="error-message">Hata: {error}</p>;
 
+    if (!Array.isArray(results)) {
+        return <p>📭 Henüz sonuç girdiğiniz sınav bulunmamaktadır.</p>;
+    }
+
     return (
         <div className="past-exam-results">
             <h2>📊 Geçmiş Sınav Sonuçlarınız</h2>
