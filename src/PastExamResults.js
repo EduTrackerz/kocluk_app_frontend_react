@@ -1,5 +1,6 @@
 ﻿import React, { useEffect, useState } from 'react';
 import config from './config';
+import ExamProgressChart from './components/ExamProgressChart';
 
 const PastExamResults = ({ studentId }) => {
     const [results, setResults] = useState([]);
@@ -62,6 +63,8 @@ const PastExamResults = ({ studentId }) => {
     return (
         <div className="past-exam-results">
             <h2>📊 Geçmiş Sınav Sonuçlarınız</h2>
+
+            {results.length > 0 && <ExamProgressChart results={results} />}
 
             {results.length === 0 ? (
                 <p>📭 Henüz sonuç girdiğiniz sınav bulunmamaktadır.</p>
