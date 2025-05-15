@@ -1,6 +1,8 @@
 ﻿import React, { useEffect, useState } from 'react';
 import config from './config';
 
+const MOCK_MODE = false;
+
 const EnterableExamList = ({ studentId }) => {
     const [exams, setExams] = useState([]);
     const [loading, setLoading] = useState(true);

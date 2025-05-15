@@ -12,7 +12,7 @@ function RegisterAdmin() {
             const newAdmin = await Admin.register({ username, name });
             if (newAdmin && newAdmin.id) {
                 alert("Kayıt başarılı!");
-                navigate(`/admin/mainPage/${newAdmin.id}`);
+                navigate(`/mainpage/admin/${newAdmin.id}`);
             } else {
                 alert("Kayıt sırasında bir hata oluştu.");
             }
@@ -23,7 +23,7 @@ function RegisterAdmin() {
     };
 
     return (
-        <div className="text-center mt-20">
+        <div style={{ textAlign: "center", marginTop: "50px" }}>
             <h2 className="text-2xl font-bold mb-4">Yönetici Kayıt</h2>
             <input
                 className="border rounded px-3 py-2 mb-2"
