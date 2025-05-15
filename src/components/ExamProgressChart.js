@@ -1,14 +1,13 @@
-// components/ExamProgressChart.js
 import React, { useState, useMemo } from 'react';
 import {
     LineChart, Line, XAxis, YAxis, CartesianGrid,
-    Tooltip, Legend, ResponsiveContainer, Brush
+    Tooltip, ResponsiveContainer
 } from 'recharts';
 import { format } from 'date-fns';
 import { tr } from 'date-fns/locale';
 
 const ExamProgressChart = ({ results }) => {
-    const [range, setRange] = useState('all'); // '7d', '30d', '90d', 'all'
+    const [range, setRange] = useState('all');
     const dayInMs = 24 * 60 * 60 * 1000;
 
     const calcNet = (correct, wrong) =>
@@ -16,6 +15,7 @@ const ExamProgressChart = ({ results }) => {
 
     const fullData = results.map(res => {
         const date = new Date(res.exam?.examDate || res.examDate);
+        const timestamp = date.getTime();
         const totalNet = [
             calcNet(res.turkceCorrect, res.turkceWrong),
             calcNet(res.matematikCorrect, res.matematikWrong),
@@ -26,7 +26,7 @@ const ExamProgressChart = ({ results }) => {
         ].reduce((acc, val) => acc + val, 0);
 
         return {
-            date: date.getTime(),
+            date: timestamp,
             label: format(date, 'dd MMM yyyy', { locale: tr }),
             totalNet: parseFloat(totalNet.toFixed(2))
         };
@@ -71,21 +71,25 @@ const ExamProgressChart = ({ results }) => {
                     />
                     <YAxis />
                     <Tooltip
+                        formatter={(value) => [`${value}`, 'Net']}
                         labelFormatter={(timestamp) =>
                             format(new Date(timestamp), 'dd MMMM yyyy', { locale: tr })
                         }
                     />
-                    <Legend />
-                    <Line type="monotone" dataKey="totalNet" stroke="#8884d8" dot={{ r: 4 }} />
-                    {/* <Brush
-                        dataKey="date"
-                        height={25}
+                    <Line
+                        type="monotone"
+                        dataKey="totalNet"
                         stroke="#8884d8"
-                        travellerWidth={10}
-                        tickFormatter={(timestamp) =>
-                            format(new Date(timestamp), 'dd MMM', { locale: tr })
-                        }
-                    /> */}
+                        dot={({ cx, cy, payload }) => (
+                            <circle
+                                cx={cx}
+                                cy={cy}
+                                r={4}
+                                fill={payload.date >= Date.now() - 14 * dayInMs ? '#007bff' : '#ff4d4f'}
+                            />
+                        )}
+                        activeDot={{ r: 6 }}
+                    />
                 </LineChart>
             </ResponsiveContainer>
         </div>
