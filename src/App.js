@@ -7,6 +7,7 @@ import RegisterAdmin from "./registerPages/RegisterAdmin";
 import StudentMainPage from "./StudentMainPage";
 import AdminMainPage from './AdminMainPage';
 import CreateExamForm from './CreateExamForm';
+import AssignTeacherStudent from './AssignTeacherStudent';
 
 const testAdmin = {
     id: "test-admin-123",
@@ -51,6 +52,8 @@ function App() {
                     }>
                         <Route path="exam-create" element={<CreateExamForm />} />
                     </Route>
+
+                    <Route path="/assign-teacher-student" element={<AssignTeacherStudent />} />
                 </Routes>
             </div>
         </Router>
