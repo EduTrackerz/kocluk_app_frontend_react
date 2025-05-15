@@ -1,5 +1,5 @@
 ﻿import React, { useEffect, useState } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useNavigate } from 'react-router-dom';
 import Exam from './entities/Exam';
 import CreateExamForm from './CreateExamForm';
 
@@ -7,6 +7,7 @@ const AdminMainPage = () => {
     const [exams, setExams] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
+    const navigate = useNavigate(); // Yönlendirme fonksiyonu
 
     const loadExams = async () => {
         try {
@@ -103,6 +104,24 @@ const AdminMainPage = () => {
                         )}
                     </div>
                 )}
+
+                {/* Öğretmen-Öğrenci Atama Butonu */}
+                <button
+                    className="assign-button"
+                    onClick={() => navigate('/assign-teacher-student')}
+                    style={{
+                        margin: '20px 0',
+                        padding: '10px 20px',
+                        backgroundColor: '#4CAF50',
+                        color: 'white',
+                        border: 'none',
+                        borderRadius: '5px',
+                        cursor: 'pointer',
+                    }}
+                >
+                    Öğretmen-Öğrenci Ataması Yap
+                </button>
+
             </nav>
         </div>
     );
