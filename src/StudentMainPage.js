@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import EnterableExamList from './EnterableExamList';
 import PastExamResults from './PastExamResults';
+import StudentStatisticsPage from './StudentStatisticsPage';
 import './App.css';
 
 function StudentMainPage() {
@@ -37,7 +38,8 @@ function StudentMainPage() {
                 {activeTab === "enterable" && <EnterableExamList studentId={studentId} />}
                 {activeTab === "past" && <PastExamResults studentId={studentId} />}
                 {activeTab === "analysis" && (
-                    <p>📊 Gelişim grafikleri ve takvimli görünüm yakında burada olacak.</p>
+                    // <p>📊 Gelişim grafikleri ve takvimli görünüm yakında burada olacak.</p>
+                    <StudentStatisticsPage studentId={studentId} />
                 )}
             </div>
         </div>

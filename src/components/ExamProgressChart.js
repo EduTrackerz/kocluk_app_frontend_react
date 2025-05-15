@@ -58,7 +58,7 @@ const ExamProgressChart = ({ results }) => {
                 </label>
             </div>
             <ResponsiveContainer>
-                <LineChart data={filteredData} margin={{ top: 5, right: 20, bottom: 5, left: 0 }}>
+                <LineChart data={filteredData} margin={{ top: 5, right: 20, bottom: 80, left: 0 }}>
                     <CartesianGrid stroke="#ccc" strokeDasharray="5 5" />
                     <XAxis
                         type="number"
@@ -77,7 +77,7 @@ const ExamProgressChart = ({ results }) => {
                     />
                     <Legend />
                     <Line type="monotone" dataKey="totalNet" stroke="#8884d8" dot={{ r: 4 }} />
-                    <Brush
+                    {/* <Brush
                         dataKey="date"
                         height={25}
                         stroke="#8884d8"
@@ -85,7 +85,7 @@ const ExamProgressChart = ({ results }) => {
                         tickFormatter={(timestamp) =>
                             format(new Date(timestamp), 'dd MMM', { locale: tr })
                         }
-                    />
+                    /> */}
                 </LineChart>
             </ResponsiveContainer>
         </div>
