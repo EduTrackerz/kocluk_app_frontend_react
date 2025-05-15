@@ -85,7 +85,7 @@ const ExamProgressChart = ({ results }) => {
                                 cx={cx}
                                 cy={cy}
                                 r={4}
-                                fill={payload.date >= Date.now() - 14 * dayInMs ? '#007bff' : '#ff4d4f'}
+                                fill={payload.date >= Date.now() - 7 * dayInMs ? '#ff4d4f' : '#007bff'}
                             />
                         )}
                         activeDot={{ r: 6 }}
