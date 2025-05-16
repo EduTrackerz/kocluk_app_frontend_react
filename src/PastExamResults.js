@@ -64,6 +64,8 @@ const PastExamResults = ({ studentId }) => {
         <div className="past-exam-results">
             <h2>📊 Geçmiş Sınav Sonuçlarınız</h2>
 
+            {results.length > 0 && <ExamProgressChart results={results} />}
+
             {results.length === 0 ? (
                 <p>📭 Henüz sonuç girdiğiniz sınav bulunmamaktadır.</p>
             ) : (

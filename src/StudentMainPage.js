@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import EnterableExamList from './EnterableExamList';
+import AssignedExamList from './AssignedExamList';
 import PastExamResults from './PastExamResults';
 import StudentStatisticsPage from './StudentStatisticsPage';
 import './App.css';
@@ -15,6 +16,12 @@ function StudentMainPage() {
 
             <div className="tab-buttons">
                 <button
+                    className={activeTab === "enterable" ? "tab-button active-tab" : "tab-button"}
+                    onClick={() => setActiveTab("enterable")}
+                >
+                    Sınava Gir
+                </button>
+                <button
                     className={activeTab === "assigned" ? "tab-button active-tab" : "tab-button"}
                     onClick={() => setActiveTab("assigned")}
                 >
@@ -26,6 +33,12 @@ function StudentMainPage() {
                 >
                     Geçmiş Sonuçlar
                 </button>
+                <button
+                    className={activeTab === "analysis" ? "tab-button active-tab" : "tab-button"}
+                    onClick={() => setActiveTab("analysis")}
+                >
+                    İstatistik (Yakında)
+                </button>
             </div>
 
             <div className="tab-content">
@@ -35,6 +48,7 @@ function StudentMainPage() {
                     // <p>📊 Gelişim grafikleri ve takvimli görünüm yakında burada olacak.</p>
                     <StudentStatisticsPage studentId={studentId} />
                 )}
+                {activeTab === "assigned" && <AssignedExamList studentId={studentId} />}
             </div>
         </div>
     );

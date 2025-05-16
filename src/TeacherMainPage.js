@@ -1,9 +1,10 @@
 import React from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 import AssignExamToStudent from './AssignExamToStudent';
 
 function TeacherMainPage() {
     const navigate = useNavigate(); // Yönlendirme fonksiyonu
+    const { id: teacherId } = useParams();
 
     return (
         <div className="teacher-container">
@@ -23,6 +24,8 @@ function TeacherMainPage() {
             >
                 Öğrenciye Sınav Ataması Yap
             </button>
+
+            <AssignExamToStudent teacherId={teacherId} />
         </div>
     );
 }

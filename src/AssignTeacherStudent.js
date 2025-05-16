@@ -65,7 +65,7 @@ const AssignTeacherStudent = () => {
         }
 
         try {
-            const response = await fetch(`${config.backendUrl}/assign-student-to-teacher?studentId=${selectedStudent}&teacherId=${selectedTeacher}`, {
+            const response = await fetch(`${config.backendUrl}/admins/assign-student-to-teacher?studentId=${selectedStudent}&teacherId=${selectedTeacher}`, {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
