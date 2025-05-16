@@ -1,33 +1,38 @@
 import React, { useState, useEffect } from 'react';
+import config from './config';
 
-// Mock veriler
-const mockStudents = [
-    { id: "student1", name: "Ali Veli", username: "aliv" },
-    { id: "student2", name: "Fatma Çelik", username: "fatmac" },
-    { id: "student3", name: "Canan Öz", username: "canano" },
-];
-
-const mockExams = [
-    { id: "exam1", name: "Matematik Sınavı", username: "math101" },
-    { id: "exam2", name: "Fizik Sınavı", username: "physics101" },
-    { id: "exam3", name: "Kimya Sınavı", username: "chemistry101" },
-];
-
-const AssignExamToStudent = () => {
+const AssignExamToStudent = ({ teacherId }) => {
     const [students, setStudents] = useState([]);
     const [exams, setExams] = useState([]);
     const [selectedStudents, setSelectedStudents] = useState([]);
     const [selectedExam, setSelectedExam] = useState('');
     const [statusMessage, setStatusMessage] = useState('');
     const [success, setSuccess] = useState(false);
+    
 
     useEffect(() => {
-        // Mock verileri yükle
-        setStudents(mockStudents);
-        setExams(mockExams);
-    }, []);
+        const fetchData = async () => {
+            try {
+                // Öğrenci listesini getir
+                const studentResponse = await fetch(`${config.backendUrl}/teachers/${teacherId}/students`);
+                if (!studentResponse.ok) throw new Error("Öğrenci listesi yüklenemedi");
+                const studentData = await studentResponse.json();
+                setStudents(studentData);
 
-    const handleAssign = () => {
+                // Sınav listesini getir
+                const examResponse = await fetch(`${config.backendUrl}/api/exams/all`);
+                if (!examResponse.ok) throw new Error("Sınav listesi yüklenemedi");
+                const examData = await examResponse.json();
+                setExams(examData);
+            } catch (error) {
+                console.error("Veri yükleme hatası:", error);
+            }
+        };
+
+        fetchData();
+    }, [teacherId]);
+
+    const handleAssign = async () => {
         if (selectedStudents.length === 0) {
             alert("Lütfen en az bir öğrenci seçin.");
             return;
@@ -38,9 +43,29 @@ const AssignExamToStudent = () => {
             return;
         }
 
-        // Mock atama işlemi
-        setStatusMessage("✅ Sınav başarıyla atandı!");
-        setSuccess(true);
+        try {
+            // const response = await fetch(`${config.backendUrl}/teacher/assign-exam?studentIds=${selectedStudents}&examId=${selectedExam}`, {
+            const response = await fetch(`${config.backendUrl}/teachers/${teacherId}/assign-exam?studentIdList=${selectedStudents}&examId=${selectedExam}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+            });
+
+            if (!response.ok) throw new Error("Sınav atama başarısız");
+            setStatusMessage("✅ Sınav başarıyla atandı!");
+            setSuccess(true);
+        } catch (error) {
+            console.error("Sınav atama hatası:", error);
+            setStatusMessage("❌ Sınav atama başarısız.");
+            setSuccess(false);
+        }
+    };
+
+    const handleStudentSelection = (studentId) => {
+        setSelectedStudents((prev) =>
+            prev.includes(studentId)
+                ? prev.filter((id) => id !== studentId)
+                : [...prev, studentId]
+        );
     };
 
     return (
@@ -54,8 +79,8 @@ const AssignExamToStudent = () => {
                     <li key={student.id}>
                         <label>
                             <input
-                                type="radio"
-                                name="student"
+                                type="radio" // Radio input kullanılıyor
+                                name="student" // Aynı grupta yalnızca bir seçim yapılabilir
                                 value={student.id}
                                 onChange={() => setSelectedStudents([student.id])}
                             />

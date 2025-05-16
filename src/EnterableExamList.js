@@ -1,44 +1,71 @@
 ﻿import React, { useEffect, useState } from 'react';
+import ExamResultForm from './ExamResultForm';
 import config from './config';
 
 const MOCK_MODE = false;
 
 const EnterableExamList = ({ studentId }) => {
     const [exams, setExams] = useState([]);
+    const [selectedExam, setSelectedExam] = useState(null);
     const [loading, setLoading] = useState(true);
 
-    const fetchAssignedExams = async () => {
+    const fetchEnterableExams = async () => {
         try {
-            const response = await fetch(`${config.backendUrl}/api/exams/assigned/${studentId}`);
-            if (!response.ok) throw new Error("Atanan sınavlar yüklenemedi");
+            if (MOCK_MODE) {
+                const mockExams = [
+                    {
+                        id: 101,
+                        name: "LGS Deneme 2",
+                        examDate: new Date().toISOString()
+                    }
+                ];
+                setExams(mockExams);
+            } else {
+                const response = await fetch(`${config.backendUrl}/api/exams/enterable/${studentId}`);
+                if (!response.ok) throw new Error("Sınavlar yüklenemedi");
 
-            const data = await response.json();
-            setExams(data);
+                const data = await response.json();
+                setExams(data);
+            }
         } catch (error) {
-            console.error("Atanan sınavları alma hatası:", error);
+            console.error("Sınavları alma hatası:", error);
         } finally {
             setLoading(false);
         }
     };
 
     useEffect(() => {
-        fetchAssignedExams();
+        fetchEnterableExams();
     }, [studentId]);
+
+    if (selectedExam) {
+        return (
+            <ExamResultForm
+                exam={selectedExam}
+                studentId={studentId}
+                onBack={() => {
+                    setSelectedExam(null);
+                    fetchEnterableExams(); // Listeyi güncelle
+                }}
+            />
+        );
+    }
 
     return (
         <div className="enterable-exam-list">
-            <h2>📋 Atanan Sınavlar</h2>
+            <h2>📝 Katılabileceğiniz Sınavlar</h2>
 
             {loading ? (
                 <p>Yükleniyor...</p>
             ) : exams.length === 0 ? (
-                <p>🎉 Size atanmış sınav bulunmamaktadır.</p>
+                <p>🎉 Girebileceğiniz sınav bulunmamaktadır.</p>
             ) : (
                 <table className="exam-table">
                     <thead>
                         <tr>
                             <th>Sınav Adı</th>
                             <th>Tarih</th>
+                            <th>İşlem</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -46,6 +73,11 @@ const EnterableExamList = ({ studentId }) => {
                             <tr key={exam.id}>
                                 <td>{exam.name}</td>
                                 <td>{new Date(exam.examDate).toLocaleString("tr-TR")}</td>
+                                <td>
+                                    <button onClick={() => setSelectedExam(exam)}>
+                                        Sınava Gir
+                                    </button>
+                                </td>
                             </tr>
                         ))}
                     </tbody>
