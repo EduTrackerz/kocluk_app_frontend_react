@@ -7,7 +7,7 @@ import './App.css';
 
 function StudentMainPage() {
     const { id: studentId } = useParams();
-    const [activeTab, setActiveTab] = useState("enterable");
+    const [activeTab, setActiveTab] = useState("assigned");
 
     return (
         <div className="page-wrapper slide-fade-in">
@@ -15,22 +15,16 @@ function StudentMainPage() {
 
             <div className="tab-buttons">
                 <button
-                    className={activeTab === "enterable" ? "tab-button active-tab" : "tab-button"}
-                    onClick={() => setActiveTab("enterable")}
+                    className={activeTab === "assigned" ? "tab-button active-tab" : "tab-button"}
+                    onClick={() => setActiveTab("assigned")}
                 >
-                    Sınava Gir
+                    Atanan Sınavlar
                 </button>
                 <button
                     className={activeTab === "past" ? "tab-button active-tab" : "tab-button"}
                     onClick={() => setActiveTab("past")}
                 >
                     Geçmiş Sonuçlar
-                </button>
-                <button
-                    className={activeTab === "analysis" ? "tab-button active-tab" : "tab-button"}
-                    onClick={() => setActiveTab("analysis")}
-                >
-                    İstatistik (Yakında)
                 </button>
             </div>
 
