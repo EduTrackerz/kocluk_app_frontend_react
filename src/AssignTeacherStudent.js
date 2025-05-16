@@ -17,14 +17,14 @@ const AssignTeacherStudent = () => {
     const [teachers, setTeachers] = useState([]);
     const [selectedTeacher, setSelectedTeacher] = useState(null);
     const [students, setStudents] = useState([]);
-    const [selectedStudents, setSelectedStudents] = useState([]);
+    const [selectedStudent, setSelectedStudent] = useState(null); // Tek bir öğrenci seçimi için
     const [statusMessage, setStatusMessage] = useState('');
 
     // Öğretmenleri getir
     useEffect(() => {
         const fetchTeachers = async () => {
             try {
-                const response = await fetch(`${config.backendUrl}/api/teachers`);
+                const response = await fetch(`${config.backendUrl}/teachers/getall`);
                 if (!response.ok) throw new Error("Öğretmen listesi yüklenemedi");
                 const data = await response.json();
                 setTeachers(data);
@@ -40,7 +40,7 @@ const AssignTeacherStudent = () => {
     useEffect(() => {
         const fetchStudents = async () => {
             try {
-                const response = await fetch(`${config.backendUrl}/api/students`);
+                const response = await fetch(`${config.backendUrl}/students/getall`);
                 if (!response.ok) throw new Error("Öğrenci listesi yüklenemedi");
                 const data = await response.json();
                 setStudents(data);
@@ -59,20 +59,20 @@ const AssignTeacherStudent = () => {
             return;
         }
 
-        if (selectedStudents.length === 0) {
-            alert("Lütfen en az bir öğrenci seçin.");
+        if (!selectedStudent) {
+            alert("Lütfen bir öğrenci seçin.");
             return;
         }
 
         try {
-            const response = await fetch(`${config.backendUrl}/api/assign-teacher-student`, {
+            const response = await fetch(`${config.backendUrl}/assign-student-to-teacher?studentId=${selectedStudent}&teacherId=${selectedTeacher}`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    teacherId: selectedTeacher,
-                    studentIds: selectedStudents,
-                }),
+                headers: {
+                    'Content-Type': 'application/json',
+                },
             });
+
+            console.log("API Yanıtı:", response);
 
             if (!response.ok) throw new Error("Atama işlemi başarısız");
             setStatusMessage("✅ Öğrenci atama işlemi başarıyla tamamlandı!");
@@ -111,16 +111,10 @@ const AssignTeacherStudent = () => {
                     <li key={student.id}>
                         <label>
                             <input
-                                type="checkbox"
+                                type="radio" // Radio input kullanılıyor
+                                name="student" // Aynı grupta yalnızca bir seçim yapılabilir
                                 value={student.id}
-                                onChange={(e) => {
-                                    const studentId = e.target.value;
-                                    setSelectedStudents((prev) =>
-                                        prev.includes(studentId)
-                                            ? prev.filter((id) => id !== studentId)
-                                            : [...prev, studentId]
-                                    );
-                                }}
+                                onChange={() => setSelectedStudent(student.id)}
                             />
                             {student.name} ({student.username})
                         </label>

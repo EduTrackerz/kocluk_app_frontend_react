@@ -1,78 +1,94 @@
 import React, { useState, useEffect } from 'react';
-import config from './config';
 
-const AssignExamToStudent = ({ examId }) => {
+// Mock veriler
+const mockStudents = [
+    { id: "student1", name: "Ali Veli", username: "aliv" },
+    { id: "student2", name: "Fatma Çelik", username: "fatmac" },
+    { id: "student3", name: "Canan Öz", username: "canano" },
+];
+
+const mockExams = [
+    { id: "exam1", name: "Matematik Sınavı", username: "math101" },
+    { id: "exam2", name: "Fizik Sınavı", username: "physics101" },
+    { id: "exam3", name: "Kimya Sınavı", username: "chemistry101" },
+];
+
+const AssignExamToStudent = () => {
     const [students, setStudents] = useState([]);
+    const [exams, setExams] = useState([]);
     const [selectedStudents, setSelectedStudents] = useState([]);
+    const [selectedExam, setSelectedExam] = useState('');
     const [statusMessage, setStatusMessage] = useState('');
-    const [success, setSuccess] = useState(false); // Başarı durumunu takip etmek için state
+    const [success, setSuccess] = useState(false);
 
     useEffect(() => {
-        const fetchStudents = async () => {
-            try {
-                const response = await fetch(`${config.backendUrl}/api/students`);
-                if (!response.ok) throw new Error("Öğrenci listesi yüklenemedi");
-                const data = await response.json();
-                setStudents(data);
-            } catch (error) {
-                console.error("Öğrenci listesi hatası:", error);
-            }
-        };
-
-        fetchStudents();
+        // Mock verileri yükle
+        setStudents(mockStudents);
+        setExams(mockExams);
     }, []);
 
-    const handleAssign = async () => {
+    const handleAssign = () => {
         if (selectedStudents.length === 0) {
             alert("Lütfen en az bir öğrenci seçin.");
             return;
         }
 
-        try {
-            const response = await fetch(`${config.backendUrl}/api/exams/assign`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ examId, studentIds: selectedStudents })
-            });
-
-            if (!response.ok) throw new Error("Sınav atama başarısız");
-            setStatusMessage("✅ Sınav başarıyla atandı!");
-            setSuccess(true); // Başarı durumunu güncelle
-        } catch (error) {
-            console.error("Sınav atama hatası:", error);
-            setStatusMessage("❌ Sınav atama başarısız.");
-            setSuccess(false); // Başarısız durumunu güncelle
+        if (!selectedExam) {
+            alert("Lütfen bir sınav seçin.");
+            return;
         }
-    };
 
-    const handleStudentSelection = (studentId) => {
-        setSelectedStudents((prev) =>
-            prev.includes(studentId)
-                ? prev.filter((id) => id !== studentId)
-                : [...prev, studentId]
-        );
+        // Mock atama işlemi
+        setStatusMessage("✅ Sınav başarıyla atandı!");
+        setSuccess(true);
     };
 
     return (
         <div className="assign-exam">
             <h3>👩‍🎓 Öğrencilere Sınav Ata</h3>
-            <ul className="student-list">
+            
+            {/* Öğrenci Listesi */}
+            <h3>Öğrenciler</h3>
+            <ul>
                 {students.map((student) => (
                     <li key={student.id}>
                         <label>
                             <input
-                                type="checkbox"
+                                type="radio"
+                                name="student"
                                 value={student.id}
-                                onChange={() => handleStudentSelection(student.id)}
+                                onChange={() => setSelectedStudents([student.id])}
                             />
                             {student.name} ({student.username})
                         </label>
                     </li>
                 ))}
             </ul>
+
+            {/* Sınav Seçimi */}
+            <h3>Sınavlar</h3>
+            <ul>
+                {exams.map((exam) => (
+                    <li key={exam.id}>
+                        <label>
+                            <input
+                                type="radio"
+                                name="exam"
+                                value={exam.id}
+                                onChange={() => setSelectedExam(exam.id)}
+                            />
+                            {exam.name} ({exam.username})
+                        </label>
+                    </li>
+                ))}
+            </ul>
+
+            {/* Atama Butonu */}
             <button onClick={handleAssign} className="assign-button">
                 Ata
             </button>
+
+            {/* Durum Mesajı */}
             {statusMessage && (
                 <p
                     style={{
@@ -85,6 +101,28 @@ const AssignExamToStudent = ({ examId }) => {
                 >
                     {statusMessage}
                 </p>
+            )}
+
+            {/* Atama Sonrası Listeleme */}
+            {success && (
+                <div className="assigned-info">
+                    <h3>Atanan Öğrenciler</h3>
+                    <ul>
+                        {selectedStudents.map((studentId) => {
+                            const student = students.find((s) => s.id === studentId);
+                            return (
+                                <li key={studentId}>
+                                    {student?.name} ({student?.username})
+                                </li>
+                            );
+                        })}
+                    </ul>
+
+                    <h3>Atanan Sınav</h3>
+                    <p>
+                        {exams.find((exam) => exam.id === selectedExam)?.name}
+                    </p>
+                </div>
             )}
         </div>
     );
