@@ -6,12 +6,12 @@ const MOCK_MODE = false;
 
 const ExamResultForm = ({ exam, studentId, onBack }) => {
     const subjects = [
-        { key: 'turkce', name: 'Türkçe', max: exam.turkceCount },
-        { key: 'matematik', name: 'Matematik', max: exam.matematikCount },
-        { key: 'fen', name: 'Fen', max: exam.fenCount },
-        { key: 'sosyal', name: 'Sosyal', max: exam.sosyalCount },
-        { key: 'din', name: 'Din Kültürü', max: exam.dinCount },
-        { key: 'yabanci', name: 'Yabancı Dil', max: exam.yabanciCount }
+        { key: 'turkce', name: 'Türkçe', max: exam.turkceCount, id: 1 },
+        { key: 'matematik', name: 'Matematik', max: exam.matematikCount, id: 2 },
+        { key: 'fen', name: 'Fen', max: exam.fenCount, id: 3 },
+        { key: 'sosyal', name: 'Sosyal', max: exam.sosyalCount, id: 4 },
+        { key: 'din', name: 'Din Kültürü', max: exam.dinCount, id: 5 },
+        { key: 'yabanci', name: 'Yabancı Dil', max: exam.yabanciCount, id: 6 }
     ];
 
     const [formData, setFormData] = useState(() =>
@@ -47,7 +47,14 @@ const ExamResultForm = ({ exam, studentId, onBack }) => {
             .map(({ name }) => name);
     };
 
-    const handleTopicSubmit = ({ subjectKey, correct, wrong, topics }) => {
+    const handleTopicSubmit = ({ subjectKey, correct, wrong, empty, topics }) => {
+        const updatedTopics = topics.map(t => ({
+            topicId: String(t.topicId),
+            correctAnswers: t.correctAnswers,
+            incorrectAnswers: t.incorrectAnswers,
+            blankAnswers: t.blankAnswers
+        }));
+
         setFormData((prev) => ({
             ...prev,
             [`${subjectKey}Correct`]: correct,
@@ -56,7 +63,12 @@ const ExamResultForm = ({ exam, studentId, onBack }) => {
 
         setTopicResults((prev) => ({
             ...prev,
-            [subjectKey]: { topics, correct, wrong }
+            [subjectKey]: {
+                correct,
+                wrong,
+                empty,
+                topics: updatedTopics
+            }
         }));
 
         setTopicFormVisible(false);
@@ -73,58 +85,67 @@ const ExamResultForm = ({ exam, studentId, onBack }) => {
             return;
         }
 
+        if (Object.keys(topicResults).length === 0) {
+            setStatusMessage("❌ En az bir ders için konu bazlı veri girilmelidir.");
+            return;
+        }
+
         setIsSubmitting(true);
 
-        const payload = {
-            id: {
-                studentId: parseInt(studentId),
-                examId: exam.id
-            },
-            student: { id: parseInt(studentId) },
-            exam: { id: exam.id }
-        };
+        const detailedScores = {};
+        for (const { key, max } of subjects) {
+            const result = topicResults[key];
+            if (!result) continue;
 
-        subjects.forEach(({ key }) => {
-            payload[`${key}Correct`] = formData[`${key}Correct`];
-            payload[`${key}Wrong`] = formData[`${key}Wrong`];
-        });
+            const topicMap = {};
+            let sum = 0;
+
+            result.topics.forEach(t => {
+                topicMap[String(t.topicId)] = {
+                    correctAnswers: t.correctAnswers,
+                    incorrectAnswers: t.incorrectAnswers,
+                    blankAnswers: t.blankAnswers
+                };
+                sum += t.correctAnswers + t.incorrectAnswers + t.blankAnswers;
+            });
+
+            if (sum !== max) {
+                setStatusMessage(`❌ ${key} dersi için toplam cevap sayısı ${sum}, olması gereken: ${max}`);
+                setIsSubmitting(false);
+                return;
+            }
+
+            detailedScores[key] = topicMap;
+        }
+
+        if (Object.keys(detailedScores).length === 0) {
+            setStatusMessage("❌ Gönderilecek veri bulunamadı.");
+            setIsSubmitting(false);
+            return;
+        }
 
         try {
             if (MOCK_MODE) {
-                console.log("📦 [MOCK] Payload gönderiliyor:", payload);
-                console.log("📦 [MOCK] Detaylı konu sonuçları:", topicResults);
-                await new Promise((res) => setTimeout(res, 1000));
-                setStatusMessage("✅ Sınav sonucu ve detaylar başarıyla kaydedildi (mock).");
+                console.log("📦 MOCK POST:", detailedScores);
+                await new Promise(r => setTimeout(r, 1000));
+                setStatusMessage("✅ Başarıyla kaydedildi (mock).");
             } else {
-                const [res1, res2] = await Promise.all([
-                    fetch(`${config.backendUrl}/api/exam-results/add`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(payload)
-                    }),
-                    fetch(`${config.backendUrl}/api/topic-results/add-all`, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            studentId: parseInt(studentId),
-                            examId: exam.id,
-                            results: topicResults
-                        })
-                    })
-                ]);
+                const res = await fetch(`${config.backendUrl}/api/exam-results/add?studentId=${studentId}&examId=${exam.id}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ detailedScores })
+                });
 
-                if (!res1.ok || !res2.ok) throw new Error("Kayıt başarısız");
-
-                const result = await res1.json();
-                setStatusMessage(result.message || "Başarıyla kaydedildi.");
+                if (!res.ok) throw new Error(await res.text());
+                setStatusMessage("✅ Başarıyla kaydedildi.");
             }
 
             setTimeout(() => {
                 setStatusMessage('');
                 onBack();
             }, 2000);
-        } catch (error) {
-            setStatusMessage("❌ Hata oluştu: " + error.message);
+        } catch (err) {
+            setStatusMessage("❌ Hata oluştu: " + err.message);
         } finally {
             setIsSubmitting(false);
         }
@@ -138,13 +159,8 @@ const ExamResultForm = ({ exam, studentId, onBack }) => {
                 <TopicResultForm
                     subjectKey={topicEntrySubject.key}
                     subjectName={topicEntrySubject.name}
-                    topics={[
-                        { name: "Konu 1" },
-                        { name: "Konu 2" },
-                        { name: "Konu 3" },
-                        { name: "Konu 4" },
-                        { name: "Konu 5" }
-                    ]}
+                    lessonId={topicEntrySubject.id}
+                    max={topicEntrySubject.max}
                     onSubmit={handleTopicSubmit}
                     onCancel={() => {
                         setTopicFormVisible(false);
@@ -155,68 +171,41 @@ const ExamResultForm = ({ exam, studentId, onBack }) => {
 
             {!topicFormVisible && (
                 <form onSubmit={handleSubmit}>
-                    {subjects.map(({ key, name, max }) => {
+                    {subjects.map(({ key, name, max, id }) => {
                         const correct = formData[`${key}Correct`];
                         const wrong = formData[`${key}Wrong`];
                         const total = correct + wrong;
                         const overLimit = total > max;
-                        const topicData = topicResults[key];
-                        const missingTopic = total > 0 && (!topicData || topicData.topics.length === 0);
 
                         return (
-                            <div
-                                key={key}
-                                className="form-row"
-                                style={missingTopic ? { border: '1px solid red', borderRadius: '4px', padding: '0.5rem' } : {}}
-                            >
+                            <div key={key} className="form-row">
                                 <label className="form-label">{name} ({max} soru):</label>
                                 <div className="input-pair">
-                                    <input
-                                        type="number"
-                                        name={`${key}Correct`}
-                                        value={correct}
-                                        onChange={handleChange}
-                                        min="0"
-                                        className="form-input"
-                                    />
+                                    <input type="number" name={`${key}Correct`} value={correct} onChange={handleChange} min="0" className="form-input" />
                                     <span>Doğru</span>
-                                    <input
-                                        type="number"
-                                        name={`${key}Wrong`}
-                                        value={wrong}
-                                        onChange={handleChange}
-                                        min="0"
-                                        className="form-input"
-                                    />
+                                    <input type="number" name={`${key}Wrong`} value={wrong} onChange={handleChange} min="0" className="form-input" />
                                     <span>Yanlış</span>
                                 </div>
-
                                 {overLimit && (
                                     <span className="total-error">
                                         Toplam {total}/{max}
                                     </span>
                                 )}
-
                                 <button
                                     type="button"
                                     className="topic-entry-button"
                                     onClick={() => {
-                                        setTopicEntrySubject({ key, name });
+                                        setTopicEntrySubject({ key, name, id, max });
                                         setTopicFormVisible(true);
                                     }}
                                 >
                                     Konu Bazlı Giriş
                                 </button>
-
-                                {topicData ? (
+                                {topicResults[key] && (
                                     <div style={{ fontSize: '0.9rem', marginLeft: '1rem', color: 'green' }}>
-                                        ✅ {topicData.topics.length} konu girildi ({topicData.correct}D / {topicData.wrong}Y)
+                                        ✅ {topicResults[key].topics.length} konu girildi ({topicResults[key].correct}D / {topicResults[key].wrong}Y / {topicResults[key].empty}B)
                                     </div>
-                                ) : missingTopic ? (
-                                    <div style={{ fontSize: '0.9rem', marginLeft: '1rem', color: 'red' }}>
-                                        ⚠️ Konu detayları girilmedi
-                                    </div>
-                                ) : null}
+                                )}
                             </div>
                         );
                     })}

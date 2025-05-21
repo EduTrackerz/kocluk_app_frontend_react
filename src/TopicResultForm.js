@@ -1,38 +1,68 @@
-
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import './TopicResultForm.css';
+import config from './config';
 
-const TopicResultForm = ({ subjectName, subjectKey, topics, max, onSubmit, onCancel }) => {
-    const [topicData, setTopicData] = useState(() =>
-        topics.map(topic => ({
-            topicId: topic.id,
-            name: topic.name,
-            correct: 0,
-            wrong: 0
-        }))
-    );
+const TopicResultForm = ({ subjectName, subjectKey, lessonId, max, onSubmit, onCancel }) => {
+    const [topics, setTopics] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchTopics = async () => {
+            try {
+                const response = await fetch(`${config.backendUrl}/subjects/${lessonId}/topics`);
+                if (!response.ok) throw new Error("Sunucu hatası");
+                const data = await response.json();
+
+                const initialData = data.map(t => ({
+                    topicId: t.id,
+                    topicName: t.name,
+                    correct: 0,
+                    wrong: 0
+                }));
+
+                setTopics(initialData);
+            } catch (error) {
+                console.error("Konu listesi alınamadı:", error);
+                setTopics([]);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchTopics();
+    }, [lessonId]);
 
     const handleChange = (index, field, value) => {
         const numeric = Math.max(0, parseInt(value) || 0);
-        const updated = [...topicData];
-        updated[index][field] = numeric;
-        setTopicData(updated);
+        setTopics(prev => {
+            const updated = [...prev];
+            updated[index][field] = numeric;
+            return updated;
+        });
     };
 
-    const totalCorrect = topicData.reduce((acc, t) => acc + t.correct, 0);
-    const totalWrong = topicData.reduce((acc, t) => acc + t.wrong, 0);
-    const total = totalCorrect + totalWrong;
-    const overLimit = total > max;
+    const totalCorrect = topics.reduce((acc, t) => acc + t.correct, 0);
+    const totalWrong = topics.reduce((acc, t) => acc + t.wrong, 0);
+    const totalBlank = Math.max(0, max - (totalCorrect + totalWrong));
 
     const handleSubmit = () => {
-        if (overLimit) return;
+        const topicPayloads = topics.map(t => ({
+            topicId: String(t.topicId),
+            correctAnswers: t.correct,
+            incorrectAnswers: t.wrong,
+            blankAnswers: Math.max(0, max - (t.correct + t.wrong))
+        }));
+
         onSubmit({
             subjectKey,
             correct: totalCorrect,
             wrong: totalWrong,
-            topics: topicData
+            empty: totalBlank,
+            topics: topicPayloads
         });
     };
+
+    if (loading) return <p>Konular yükleniyor...</p>;
 
     return (
         <div className="topic-result-form form-container">
@@ -46,9 +76,9 @@ const TopicResultForm = ({ subjectName, subjectKey, topics, max, onSubmit, onCan
                     </tr>
                 </thead>
                 <tbody>
-                    {topicData.map((topic, index) => (
-                        <tr key={index}>
-                            <td>{topic.name}</td>
+                    {topics.map((topic, index) => (
+                        <tr key={topic.topicId}>
+                            <td>{topic.topicName}</td>
                             <td>
                                 <input
                                     type="number"
@@ -71,16 +101,11 @@ const TopicResultForm = ({ subjectName, subjectKey, topics, max, onSubmit, onCan
             </table>
 
             <div style={{ marginTop: "1rem" }}>
-                <p><b>Toplam:</b> {totalCorrect} Doğru, {totalWrong} Yanlış</p>
-                {overLimit && (
-                    <p style={{ color: "red", fontWeight: "bold" }}>
-                        Toplam doğru + yanlış sayısı bu derste {max} soruyu geçemez! (Şu an: {total}/{max})
-                    </p>
-                )}
+                <p><b>Toplam:</b> {totalCorrect} Doğru, {totalWrong} Yanlış, {totalBlank} Boş</p>
             </div>
 
             <div className="form-actions">
-                <button onClick={handleSubmit} disabled={overLimit}>Kaydet</button>
+                <button onClick={handleSubmit}>Kaydet</button>
                 <button className="cancel-button" onClick={onCancel}>İptal</button>
             </div>
         </div>
