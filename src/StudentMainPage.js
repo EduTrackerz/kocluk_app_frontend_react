@@ -5,6 +5,7 @@ import AssignedExamList from './AssignedExamList';
 import PastExamResults from './PastExamResults';
 import StudentStatisticsPage from './StudentStatisticsPage';
 import './App.css';
+import AssignedTeachersList from './AssignedTeachersList';
 
 function StudentMainPage() {
     const { id: studentId } = useParams();
@@ -39,6 +40,13 @@ function StudentMainPage() {
                 >
                     İstatistik (Yakında)
                 </button>
+
+                    <button
+                        className={activeTab === "teachers" ? "tab-button active-tab" : "tab-button"}
+                        onClick={() => setActiveTab("teachers")}
+                    >
+                        Atanan Öğretmenler
+                    </button>
             </div>
 
             <div className="tab-content">
@@ -48,6 +56,8 @@ function StudentMainPage() {
                     // <p>📊 Gelişim grafikleri ve takvimli görünüm yakında burada olacak.</p>
                     <StudentStatisticsPage studentId={studentId} />
                 )}
+                
+                {activeTab === "teachers" && <AssignedTeachersList studentId={studentId} />}
                 {activeTab === "assigned" && <AssignedExamList studentId={studentId} />}
             </div>
         </div>

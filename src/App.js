@@ -12,6 +12,7 @@ import Header from './theme/Header';
 import TeacherMainPage from './TeacherMainPage';
 import AssignExamToStudent from './AssignExamToStudent';
 import { UserProvider } from './context/UserContext';
+import AssignExamToStudentPage from './AssignExamToStudentPage';
 
 const testAdmin = {
     id: "test-admin-123",
@@ -59,6 +60,10 @@ function App() {
 
                         <Route path="/assign-teacher-student" element={<AssignTeacherStudent />} />
                         <Route path="/teacher/mainPage/:id" element={<TeacherMainPage />} />
+                        <Route path="/teacher/:id" element={<TeacherMainPage />} />
+                        <Route path="/assign-exam/:id" element={<AssignExamToStudentPage />} />
+                        <Route path="/student/:id" element={<StudentMainPage />} />
+                        <Route path="/teacher/:id" element={<TeacherMainPage />} />
                         <Route path="/assign-exam-to-student" element={<AssignExamToStudent />} />
                     </Routes>
                 </div>
