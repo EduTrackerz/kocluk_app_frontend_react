@@ -14,51 +14,34 @@ const ExamResultForm = ({ exam, studentId, onBack }) => {
         { key: 'yabanci', name: 'Yabancı Dil', max: exam.yabanciCount, id: 6 }
     ];
 
-    const [formData, setFormData] = useState(() =>
-        Object.fromEntries(subjects.flatMap(({ key }) => [
-            [`${key}Correct`, 0],
-            [`${key}Wrong`, 0]
-        ]))
-    );
     const [statusMessage, setStatusMessage] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [topicEntrySubject, setTopicEntrySubject] = useState(null);
     const [topicFormVisible, setTopicFormVisible] = useState(false);
     const [topicResults, setTopicResults] = useState({});
 
-    const handleChange = (e) => {
-        const { name, value } = e.target;
-        const numericValue = Math.max(0, parseInt(value) || 0);
-        setFormData((prev) => ({ ...prev, [name]: numericValue }));
-    };
-
     const isInvalid = subjects.some(({ key, max }) => {
-        const total = formData[`${key}Correct`] + formData[`${key}Wrong`];
-        return total > max;
+        const result = topicResults[key];
+        return result && result.total > max;
     });
 
     const getMissingTopicEntries = () => {
         return subjects
             .filter(({ key }) => {
-                const total = formData[`${key}Correct`] + formData[`${key}Wrong`];
                 const topicData = topicResults[key];
-                return total > 0 && (!topicData || topicData.topics.length === 0);
+                return !topicData || topicData.topics.length === 0;
             })
             .map(({ name }) => name);
     };
 
     const handleTopicSubmit = ({ subjectKey, correct, wrong, empty, topics }) => {
+        const totalCount = correct + wrong + empty;
+
         const updatedTopics = topics.map(t => ({
             topicId: String(t.topicId),
             correctAnswers: t.correctAnswers,
             incorrectAnswers: t.incorrectAnswers,
             blankAnswers: t.blankAnswers
-        }));
-
-        setFormData((prev) => ({
-            ...prev,
-            [`${subjectKey}Correct`]: correct,
-            [`${subjectKey}Wrong`]: wrong
         }));
 
         setTopicResults((prev) => ({
@@ -67,6 +50,7 @@ const ExamResultForm = ({ exam, studentId, onBack }) => {
                 correct,
                 wrong,
                 empty,
+                total: totalCount,
                 topics: updatedTopics
             }
         }));
@@ -77,7 +61,11 @@ const ExamResultForm = ({ exam, studentId, onBack }) => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        if (isInvalid) return;
+
+        if (isInvalid) {
+            setStatusMessage("❌ Bazı derslerde toplam cevap sayısı maksimumu aşıyor.");
+            return;
+        }
 
         const missingSubjects = getMissingTopicEntries();
         if (missingSubjects.length > 0) {
@@ -93,24 +81,23 @@ const ExamResultForm = ({ exam, studentId, onBack }) => {
         setIsSubmitting(true);
 
         const detailedScores = {};
+
         for (const { key, max } of subjects) {
             const result = topicResults[key];
             if (!result) continue;
 
             const topicMap = {};
-            let sum = 0;
-
             result.topics.forEach(t => {
-                topicMap[String(t.topicId)] = {
+                topicMap[t.topicId] = {
                     correctAnswers: t.correctAnswers,
                     incorrectAnswers: t.incorrectAnswers,
                     blankAnswers: t.blankAnswers
                 };
-                sum += t.correctAnswers + t.incorrectAnswers + t.blankAnswers;
             });
 
-            if (sum !== max) {
-                setStatusMessage(`❌ ${key} dersi için toplam cevap sayısı ${sum}, olması gereken: ${max}`);
+            const totalCount = result.correct + result.wrong + result.empty;
+            if (totalCount !== max) {
+                setStatusMessage(`❌ ${key} dersi için toplam cevap sayısı ${totalCount}, olması gereken: ${max}`);
                 setIsSubmitting(false);
                 return;
             }
@@ -118,17 +105,12 @@ const ExamResultForm = ({ exam, studentId, onBack }) => {
             detailedScores[key] = topicMap;
         }
 
-        if (Object.keys(detailedScores).length === 0) {
-            setStatusMessage("❌ Gönderilecek veri bulunamadı.");
-            setIsSubmitting(false);
-            return;
-        }
-
         try {
             if (MOCK_MODE) {
                 console.log("📦 MOCK POST:", detailedScores);
                 await new Promise(r => setTimeout(r, 1000));
                 setStatusMessage("✅ Başarıyla kaydedildi (mock).");
+
             } else {
                 const res = await fetch(`${config.backendUrl}/api/exam-results/add?studentId=${studentId}&examId=${exam.id}`, {
                     method: 'POST',
@@ -172,8 +154,10 @@ const ExamResultForm = ({ exam, studentId, onBack }) => {
             {!topicFormVisible && (
                 <form onSubmit={handleSubmit}>
                     {subjects.map(({ key, name, max, id }) => {
-                        const correct = formData[`${key}Correct`];
-                        const wrong = formData[`${key}Wrong`];
+                        const result = topicResults[key];
+                        const correct = result?.correct ?? 0;
+                        const wrong = result?.wrong ?? 0;
+                        const empty = result?.empty ?? 0;
                         const total = correct + wrong;
                         const overLimit = total > max;
 
@@ -181,9 +165,9 @@ const ExamResultForm = ({ exam, studentId, onBack }) => {
                             <div key={key} className="form-row">
                                 <label className="form-label">{name} ({max} soru):</label>
                                 <div className="input-pair">
-                                    <input type="number" name={`${key}Correct`} value={correct} onChange={handleChange} min="0" className="form-input" />
+                                    <input type="number" value={correct} readOnly className="form-input" />
                                     <span>Doğru</span>
-                                    <input type="number" name={`${key}Wrong`} value={wrong} onChange={handleChange} min="0" className="form-input" />
+                                    <input type="number" value={wrong} readOnly className="form-input" />
                                     <span>Yanlış</span>
                                 </div>
                                 {overLimit && (
@@ -201,9 +185,9 @@ const ExamResultForm = ({ exam, studentId, onBack }) => {
                                 >
                                     Konu Bazlı Giriş
                                 </button>
-                                {topicResults[key] && (
+                                {result && (
                                     <div style={{ fontSize: '0.9rem', marginLeft: '1rem', color: 'green' }}>
-                                        ✅ {topicResults[key].topics.length} konu girildi ({topicResults[key].correct}D / {topicResults[key].wrong}Y / {topicResults[key].empty}B)
+                                        ✅ {result.topics.length} konu girildi ({correct}D / {wrong}Y / {empty}B)
                                     </div>
                                 )}
                             </div>

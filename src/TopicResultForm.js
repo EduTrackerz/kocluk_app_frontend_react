@@ -43,21 +43,30 @@ const TopicResultForm = ({ subjectName, subjectKey, lessonId, max, onSubmit, onC
 
     const totalCorrect = topics.reduce((acc, t) => acc + t.correct, 0);
     const totalWrong = topics.reduce((acc, t) => acc + t.wrong, 0);
-    const totalBlank = Math.max(0, max - (totalCorrect + totalWrong));
+    const totalAnswered = totalCorrect + totalWrong;
+    const remainingBlank = Math.max(0, max - totalAnswered);
 
-    const handleSubmit = () => {
-        const topicPayloads = topics.map(t => ({
+    const blankPerTopic = Math.floor(remainingBlank / topics.length);
+    let extra = remainingBlank % topics.length;
+
+    const topicPayloads = topics.map((t, idx) => {
+        const distributedBlank = blankPerTopic + (extra > 0 ? 1 : 0);
+        if (extra > 0) extra--;
+
+        return {
             topicId: String(t.topicId),
             correctAnswers: t.correct,
             incorrectAnswers: t.wrong,
-            blankAnswers: Math.max(0, max - (t.correct + t.wrong))
-        }));
+            blankAnswers: distributedBlank
+        };
+    });
 
+    const handleSubmit = () => {
         onSubmit({
             subjectKey,
             correct: totalCorrect,
             wrong: totalWrong,
-            empty: totalBlank,
+            empty: remainingBlank,
             topics: topicPayloads
         });
     };
@@ -73,35 +82,46 @@ const TopicResultForm = ({ subjectName, subjectKey, lessonId, max, onSubmit, onC
                         <th>Konu</th>
                         <th>Doğru</th>
                         <th>Yanlış</th>
+                        <th>Boş</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {topics.map((topic, index) => (
-                        <tr key={topic.topicId}>
-                            <td>{topic.topicName}</td>
-                            <td>
-                                <input
-                                    type="number"
-                                    value={topic.correct}
-                                    onChange={(e) => handleChange(index, 'correct', e.target.value)}
-                                    min="0"
-                                />
-                            </td>
-                            <td>
-                                <input
-                                    type="number"
-                                    value={topic.wrong}
-                                    onChange={(e) => handleChange(index, 'wrong', e.target.value)}
-                                    min="0"
-                                />
-                            </td>
-                        </tr>
-                    ))}
+                    {topics.map((topic, index) => {
+                        const distributedBlank = topicPayloads.find(p => p.topicId === String(topic.topicId))?.blankAnswers || 0;
+                        return (
+                            <tr key={topic.topicId}>
+                                <td>{topic.topicName}</td>
+                                <td>
+                                    <input
+                                        type="number"
+                                        value={topic.correct}
+                                        onChange={(e) => handleChange(index, 'correct', e.target.value)}
+                                        min="0"
+                                    />
+                                </td>
+                                <td>
+                                    <input
+                                        type="number"
+                                        value={topic.wrong}
+                                        onChange={(e) => handleChange(index, 'wrong', e.target.value)}
+                                        min="0"
+                                    />
+                                </td>
+                                <td>
+                                    <input
+                                        type="number"
+                                        value={distributedBlank}
+                                        readOnly
+                                    />
+                                </td>
+                            </tr>
+                        );
+                    })}
                 </tbody>
             </table>
 
             <div style={{ marginTop: "1rem" }}>
-                <p><b>Toplam:</b> {totalCorrect} Doğru, {totalWrong} Yanlış, {totalBlank} Boş</p>
+                <p><b>Toplam:</b> {totalCorrect} Doğru, {totalWrong} Yanlış, {remainingBlank} Boş</p>
             </div>
 
             <div className="form-actions">
