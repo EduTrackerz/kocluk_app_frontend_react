@@ -65,7 +65,7 @@ function AssignedGoalsList({ studentId }) {
                             <strong> Süre:</strong> {new Date(goal.deadline).toLocaleDateString()} |
                             <strong> Öğretmen:</strong> {goal.teacherName}
                             <br />
-                            {(goal.complete || completedGoals.has(goal.id)) ? (
+                            {(goal.completed || completedGoals.has(goal.id)) ? (
                                 <span style={{ color: "green" }}>✅ Tamamlandı</span>
                             ) : (
                                 <button
