@@ -12,7 +12,6 @@ function AssignedGoalsList({ studentId }) {
                 const res = await fetch(`${config.backendUrl}/api/goals/student/${studentId}`);
 
                 if (!res.ok) {
-                    // Print error text for debugging
                     const errorText = await res.text();
                     console.error("Backend Hatası:", res.status, errorText);
                     return;
@@ -20,9 +19,8 @@ function AssignedGoalsList({ studentId }) {
 
                 const data = await res.json();
 
+                // Ensure it's an array
                 setGoals(Array.isArray(data) ? data : []);
-
-                setGoals(data);
             } catch (err) {
                 console.error("Hedefler alınırken hata:", err);
             } finally {
@@ -36,7 +34,7 @@ function AssignedGoalsList({ studentId }) {
     const handleComplete = async (goalId) => {
         try {
             const res = await fetch(`${config.backendUrl}/api/goals/${goalId}/complete`, {
-                method: "POST"
+                method: "PUT" // FIXED: match backend
             });
 
             if (res.ok) {
@@ -49,27 +47,25 @@ function AssignedGoalsList({ studentId }) {
         }
     };
 
-
     return (
         <div>
             <h3>🎯 Atanan Hedefler</h3>
             <ul>
-                {
-                    loading ? (
-                        <p>Yükleniyor...</p>
-                    ) : !Array.isArray(goals) ? (
-                        <p>❌ Hedefler yüklenirken bir hata oluştu.</p>
-                    ) : goals.length === 0 ? (
-                        <p>🎉 Tanımlanmış hedefiniz bulunmamaktadır.</p>
-                    ) : (
-                        goals.map((goal) => (
+                {loading ? (
+                    <p>Yükleniyor...</p>
+                ) : !Array.isArray(goals) ? (
+                    <p>❌ Hedefler yüklenirken bir hata oluştu.</p>
+                ) : goals.length === 0 ? (
+                    <p>🎉 Tanımlanmış hedefiniz bulunmamaktadır.</p>
+                ) : (
+                    goals.map((goal) => (
                         <li key={goal.id} style={{ marginBottom: "10px" }}>
                             <strong>Ders:</strong> {goal.subjectName} | 
                             <strong> Soru:</strong> {goal.questionCount} |
                             <strong> Süre:</strong> {new Date(goal.deadline).toLocaleDateString()} |
                             <strong> Öğretmen:</strong> {goal.teacherName}
                             <br />
-                            {completedGoals.has(goal.id) ? (
+                            {(goal.complete || completedGoals.has(goal.id)) ? (
                                 <span style={{ color: "green" }}>✅ Tamamlandı</span>
                             ) : (
                                 <button
@@ -81,8 +77,7 @@ function AssignedGoalsList({ studentId }) {
                             )}
                         </li>
                     ))
-                    )
-                }
+                )}
             </ul>
         </div>
     );
