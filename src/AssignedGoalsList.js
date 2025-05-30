@@ -19,6 +19,9 @@ function AssignedGoalsList({ studentId }) {
                 }
 
                 const data = await res.json();
+
+                setGoals(Array.isArray(data) ? data : []);
+
                 setGoals(data);
             } catch (err) {
                 console.error("Hedefler alınırken hata:", err);
