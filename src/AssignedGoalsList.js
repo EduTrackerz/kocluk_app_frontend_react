@@ -19,10 +19,22 @@ function AssignedGoalsList({ studentId }) {
         fetchGoals();
     }, [studentId]);
 
-    const handleComplete = (goalId) => {
-        setCompletedGoals(new Set([...completedGoals, goalId]));
-        // Backend'e bildirme gerekiyorsa burada fetch PUT/POST yapılabilir.
+    const handleComplete = async (goalId) => {
+        try {
+            const res = await fetch(`${config.backendUrl}/api/goals/${goalId}/complete`, {
+                method: "POST"
+            });
+
+            if (res.ok) {
+                setCompletedGoals(new Set([...completedGoals, goalId]));
+            } else {
+                console.error("Tamamlama isteği başarısız.");
+            }
+        } catch (err) {
+            console.error("Hedef tamamlama hatası:", err);
+        }
     };
+
 
     return (
         <div>
