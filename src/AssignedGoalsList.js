@@ -10,6 +10,14 @@ function AssignedGoalsList({ studentId }) {
         const fetchGoals = async () => {
             try {
                 const res = await fetch(`${config.backendUrl}/api/goals/student/${studentId}`);
+
+                if (!res.ok) {
+                    // Print error text for debugging
+                    const errorText = await res.text();
+                    console.error("Backend Hatası:", res.status, errorText);
+                    return;
+                }
+
                 const data = await res.json();
                 setGoals(data);
             } catch (err) {
@@ -46,6 +54,8 @@ function AssignedGoalsList({ studentId }) {
                 {
                     loading ? (
                         <p>Yükleniyor...</p>
+                    ) : !Array.isArray(goals) ? (
+                        <p>❌ Hedefler yüklenirken bir hata oluştu.</p>
                     ) : goals.length === 0 ? (
                         <p>🎉 Tanımlanmış hedefiniz bulunmamaktadır.</p>
                     ) : (
