@@ -4,6 +4,7 @@ import EnterableExamList from './EnterableExamList';
 import AssignedExamList from './AssignedExamList';
 import PastExamResults from './PastExamResults';
 import StudentStatisticsPage from './StudentStatisticsPage';
+import AssignedGoalsList from './AssignedGoalsList';
 import './App.css';
 import AssignedTeachersList from './AssignedTeachersList';
 
@@ -41,12 +42,19 @@ function StudentMainPage() {
                     İstatistik (Yakında)
                 </button>
 
-                    <button
-                        className={activeTab === "teachers" ? "tab-button active-tab" : "tab-button"}
-                        onClick={() => setActiveTab("teachers")}
-                    >
-                        Atanan Öğretmenler
-                    </button>
+                <button
+                    className={activeTab === "teachers" ? "tab-button active-tab" : "tab-button"}
+                    onClick={() => setActiveTab("teachers")}
+                >
+                    Atanan Öğretmenler
+                </button>
+
+                <button
+                    className={activeTab === "goals" ? "tab-button active-tab" : "tab-button"}
+                    onClick={() => setActiveTab("goals")}
+                >
+                    Hedeflerim
+                </button>
             </div>
 
             <div className="tab-content">
@@ -59,6 +67,7 @@ function StudentMainPage() {
                 
                 {activeTab === "teachers" && <AssignedTeachersList studentId={studentId} />}
                 {activeTab === "assigned" && <AssignedExamList studentId={studentId} />}
+                {activeTab === "goals" && <AssignedGoalsList studentId={studentId} />}
             </div>
         </div>
     );
