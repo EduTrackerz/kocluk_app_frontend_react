@@ -22,7 +22,7 @@ function RegisterTeacher() {
             const newTeacher = await Teacher.register({ username, name, branch });
             if (newTeacher && newTeacher.id) {
                 alert("Kayıt başarılı!");
-                navigate(`/mainpage/teacher/${newTeacher.id}`);
+                navigate(`/teacher/mainPage/${newTeacher.id}`);
             } else {
                 alert("Kayıt sırasında bir hata oluştu.");
             }
