@@ -7,7 +7,7 @@ const AdminMainPage = () => {
     const [exams, setExams] = useState([]);
     const [loading, setLoading] = useState(true);
     const [showForm, setShowForm] = useState(false);
-    const navigate = useNavigate(); // Yönlendirme fonksiyonu
+    const navigate = useNavigate();
 
     const loadExams = async () => {
         try {
@@ -24,9 +24,11 @@ const AdminMainPage = () => {
         loadExams();
     }, []);
 
-    const handleExamCreated = (newExam) => {
-        setExams([newExam, ...exams]);
-        setShowForm(false);
+    const handleExamAdded = (newExam) => {
+        setExams(prevExams =>
+            [...prevExams, newExam].sort((a, b) => new Date(a.examDate) - new Date(b.examDate))
+        );
+        //setShowForm(false);
     };
 
     return (
@@ -48,7 +50,7 @@ const AdminMainPage = () => {
                 {showForm && (
                     <div className="form-container">
                         <CreateExamForm
-                            onExamCreated={handleExamCreated}
+                            onExamAdded={handleExamAdded}
                             onCancel={() => setShowForm(false)}
                         />
                     </div>
@@ -105,7 +107,6 @@ const AdminMainPage = () => {
                     </div>
                 )}
 
-                {/* Öğretmen-Öğrenci Atama Butonu */}
                 <button
                     className="assign-button"
                     onClick={() => navigate('/assign-teacher-student')}
@@ -121,7 +122,6 @@ const AdminMainPage = () => {
                 >
                     Öğretmen-Öğrenci Ataması Yap
                 </button>
-
             </nav>
         </div>
     );

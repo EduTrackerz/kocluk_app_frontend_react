@@ -1,26 +1,13 @@
 import React, { useEffect, useState } from 'react';
 import config from './config';
 
-const mockTeachers = [
-    { id: "teacher1", name: "Ahmet Yılmaz", username: "ahmety" },
-    { id: "teacher2", name: "Ayşe Demir", username: "aysed" },
-    { id: "teacher3", name: "Mehmet Kaya", username: "mehmetk" },
-];
-
-const mockStudents = [
-    { id: "student1", name: "Ali Veli", username: "aliv" },
-    { id: "student2", name: "Fatma Çelik", username: "fatmac" },
-    { id: "student3", name: "Canan Öz", username: "canano" },
-];
-
 const AssignTeacherStudent = () => {
     const [teachers, setTeachers] = useState([]);
     const [selectedTeacher, setSelectedTeacher] = useState(null);
     const [students, setStudents] = useState([]);
-    const [selectedStudent, setSelectedStudent] = useState(null); // Tek bir öğrenci seçimi için
+    const [selectedStudent, setSelectedStudent] = useState(null);
     const [statusMessage, setStatusMessage] = useState('');
 
-    // Öğretmenleri getir
     useEffect(() => {
         const fetchTeachers = async () => {
             try {
@@ -32,11 +19,9 @@ const AssignTeacherStudent = () => {
                 console.error("Öğretmen listesi hatası:", error);
             }
         };
-
         fetchTeachers();
     }, []);
 
-    // Öğrencileri getir
     useEffect(() => {
         const fetchStudents = async () => {
             try {
@@ -48,37 +33,38 @@ const AssignTeacherStudent = () => {
                 console.error("Öğrenci listesi hatası:", error);
             }
         };
-
         fetchStudents();
     }, []);
 
-    // Atama işlemi
     const handleAssign = async () => {
-        if (!selectedTeacher) {
-            alert("Lütfen bir öğretmen seçin.");
-            return;
-        }
-
-        if (!selectedStudent) {
-            alert("Lütfen bir öğrenci seçin.");
+        if (!selectedTeacher || !selectedStudent) {
+            alert("Lütfen bir öğretmen ve bir öğrenci seçin.");
             return;
         }
 
         try {
-            const response = await fetch(`${config.backendUrl}/admins/assign-student-to-teacher?studentId=${selectedStudent}&teacherId=${selectedTeacher}`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-            });
+            const response = await fetch(
+                `${config.backendUrl}/admins/assign-student-to-teacher?studentId=${selectedStudent}&teacherId=${selectedTeacher}`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                }
+            );
 
-            console.log("API Yanıtı:", response);
+            if (!response.ok) {
+                const errorData = await response.json().catch(() => ({}));
+                const errorMessage =
+                    response.status === 409
+                        ? errorData.message || "Bu öğrenci zaten bu öğretmene atanmış."
+                        : errorData.message || "Atama işlemi başarısız.";
+                throw new Error(errorMessage);
+            }
 
-            if (!response.ok) throw new Error("Atama işlemi başarısız");
             setStatusMessage("✅ Öğrenci atama işlemi başarıyla tamamlandı!");
         } catch (error) {
-            console.error("Atama hatası:", error);
-            setStatusMessage("❌ Öğrenci atama işlemi başarısız.");
+            setStatusMessage("❌ " + error.message);
         }
     };
 
@@ -86,7 +72,6 @@ const AssignTeacherStudent = () => {
         <div className="assign-teacher-student">
             <h2>👩‍🏫 Öğretmen-Öğrenci Atama</h2>
 
-            {/* Öğretmen Listesi */}
             <h3>Öğretmenler</h3>
             <ul>
                 {teachers.map((teacher) => (
@@ -104,15 +89,14 @@ const AssignTeacherStudent = () => {
                 ))}
             </ul>
 
-            {/* Öğrenci Listesi */}
             <h3>Öğrenciler</h3>
             <ul>
                 {students.map((student) => (
                     <li key={student.id}>
                         <label>
                             <input
-                                type="radio" // Radio input kullanılıyor
-                                name="student" // Aynı grupta yalnızca bir seçim yapılabilir
+                                type="radio"
+                                name="student"
                                 value={student.id}
                                 onChange={() => setSelectedStudent(student.id)}
                             />
@@ -122,12 +106,10 @@ const AssignTeacherStudent = () => {
                 ))}
             </ul>
 
-            {/* Atama Butonu */}
             <button onClick={handleAssign} className="assign-button">
                 Atama Yap
             </button>
 
-            {/* Durum Mesajı */}
             {statusMessage && <p>{statusMessage}</p>}
         </div>
     );

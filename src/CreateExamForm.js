@@ -1,9 +1,7 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import Exam from './entities/Exam';
-import config from './config';
 
-const CreateExamForm = () => {
+const CreateExamForm = ({ onExamAdded, onCancel }) => {
     const [formData, setFormData] = useState({
         name: '',
         turkceCount: 20,
@@ -16,15 +14,15 @@ const CreateExamForm = () => {
     });
 
     const [errors, setErrors] = useState({});
+    const [successMessage, setSuccessMessage] = useState('');
     const [isSubmitting, setIsSubmitting] = useState(false);
-    const navigate = useNavigate();
 
     const validateForm = () => {
         const newErrors = {};
-        if (!formData.name.trim()) newErrors.name = 'Sinav adi zorunlu';
-        if (!formData.examDate) newErrors.examDate = 'Tarih secimi zorunlu';
-        if (formData.turkceCount < 0) newErrors.turkceCount = 'Gecersiz deger';
-        if (formData.matematikCount < 0) newErrors.matematikCount = 'Gecersiz deger';
+        if (!formData.name.trim()) newErrors.name = 'Sınav adı zorunlu';
+        if (!formData.examDate) newErrors.examDate = 'Tarih seçimi zorunlu';
+        if (formData.turkceCount < 0) newErrors.turkceCount = 'Geçersiz değer';
+        if (formData.matematikCount < 0) newErrors.matematikCount = 'Geçersiz değer';
 
         setErrors(newErrors);
         return Object.keys(newErrors).length === 0;
@@ -38,7 +36,6 @@ const CreateExamForm = () => {
         }));
     };
 
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         if (!validateForm()) return;
@@ -50,11 +47,29 @@ const CreateExamForm = () => {
                 examDate: new Date(formData.examDate).toISOString()
             };
 
-            await Exam.createExam(examData);
-            navigate('/admin/main', { state: { success: true, refresh: true } });
+            const createdExam = await Exam.createExam(examData);
+
+            if (onExamAdded) {
+                onExamAdded(createdExam);
+            }
+
+            // Formu sıfırla
+            setFormData({
+                name: '',
+                turkceCount: 20,
+                matematikCount: 20,
+                fenCount: 20,
+                sosyalCount: 20,
+                dinCount: 10,
+                yabanciCount: 10,
+                examDate: ''
+            });
+
+            setSuccessMessage('✅ Sınav başarıyla oluşturuldu.');
+
+
         } catch (error) {
-            //console.error('Submission error:', error);
-            //setErrors({ submit: 'Sinav olusturulamad�. L�tfen tekrar deneyin.' });
+            setErrors({ submit: 'Sınav oluşturulamadı. Lütfen tekrar deneyin.' });
         } finally {
             setIsSubmitting(false);
         }
@@ -62,115 +77,53 @@ const CreateExamForm = () => {
 
     return (
         <div className="create-exam-form">
-            <h2 className="form-title">Yeni Sinav Olustur</h2>
+            <h2 className="form-title">Yeni Sınav Oluştur</h2>
 
             {errors.submit && <div className="error-message">{errors.submit}</div>}
+
+            {successMessage && (
+                <div className="success-message" style={{ color: 'green', marginBottom: '1rem' }}>
+                    {successMessage}
+                </div>
+            )}
 
             <form onSubmit={handleSubmit} className="exam-form">
                 <div className="form-group">
                     <label className="form-label">
-                        Sinav Adi:
+                        Sınav Adı:
                         <input
                             type="text"
                             name="name"
                             value={formData.name}
                             onChange={handleChange}
                             className={`form-input ${errors.name ? 'input-error' : ''}`}
-                            placeholder="Ornek: LGS Haziran Denemesi"
+                            placeholder="Örnek: LGS Haziran Denemesi"
                         />
                     </label>
                     {errors.name && <span className="error-text">{errors.name}</span>}
                 </div>
 
                 <div className="subject-grid">
-                    <div className="subject-item">
-                        <label className="subject-label">
-                            Turkce:
-                            <input
-                                type="number"
-                                name="turkceCount"
-                                value={formData.turkceCount}
-                                onChange={handleChange}
-                                min="0"
-                                className="subject-input"
-                            />
-                        </label>
-                    </div>
-
-                    <div className="subject-item">
-                        <label className="subject-label">
-                            Matematik:
-                            <input
-                                type="number"
-                                name="matematikCount"
-                                value={formData.matematikCount}
-                                onChange={handleChange}
-                                min="0"
-                                className="subject-input"
-                            />
-                        </label>
-                    </div>
-
-                    <div className="subject-item">
-                        <label className="subject-label">
-                            Fen Bilimleri:
-                            <input
-                                type="number"
-                                name="fenCount"
-                                value={formData.fenCount}
-                                onChange={handleChange}
-                                min="0"
-                                className="subject-input"
-                            />
-                        </label>
-                    </div>
-
-                    <div className="subject-item">
-                        <label className="subject-label">
-                            Sosyal Bilgiler:
-                            <input
-                                type="number"
-                                name="sosyalCount"
-                                value={formData.sosyalCount}
-                                onChange={handleChange}
-                                min="0"
-                                className="subject-input"
-                            />
-                        </label>
-                    </div>
-
-                    <div className="subject-item">
-                        <label className="subject-label">
-                            Din Kulturu:
-                            <input
-                                type="number"
-                                name="dinCount"
-                                value={formData.dinCount}
-                                onChange={handleChange}
-                                min="0"
-                                className="subject-input"
-                            />
-                        </label>
-                    </div>
-
-                    <div className="subject-item">
-                        <label className="subject-label">
-                            Yabanci Dil:
-                            <input
-                                type="number"
-                                name="yabanciCount"
-                                value={formData.yabanciCount}
-                                onChange={handleChange}
-                                min="0"
-                                className="subject-input"
-                            />
-                        </label>
-                    </div>
+                    {['turkce', 'matematik', 'fen', 'sosyal', 'din', 'yabanci'].map((subj, i) => (
+                        <div className="subject-item" key={i}>
+                            <label className="subject-label">
+                                {subj.charAt(0).toUpperCase() + subj.slice(1)}:
+                                <input
+                                    type="number"
+                                    name={`${subj}Count`}
+                                    value={formData[`${subj}Count`]}
+                                    onChange={handleChange}
+                                    min="0"
+                                    className="subject-input"
+                                />
+                            </label>
+                        </div>
+                    ))}
                 </div>
 
                 <div className="form-group">
                     <label className="form-label">
-                        Sinav Tarihi ve Saati:
+                        Sınav Tarihi ve Saati:
                         <input
                             type="datetime-local"
                             name="examDate"
@@ -187,8 +140,19 @@ const CreateExamForm = () => {
                     className="submit-button"
                     disabled={isSubmitting}
                 >
-                    {isSubmitting ? 'Olusturuluyor...' : 'Sinavi Olustur'}
+                    {isSubmitting ? 'Oluşturuluyor...' : 'Sınavı Oluştur'}
                 </button>
+
+                {onCancel && (
+                    <button
+                        type="button"
+                        className="cancel-button"
+                        onClick={onCancel}
+                        style={{ marginLeft: '10px' }}
+                    >
+                        İptal
+                    </button>
+                )}
             </form>
         </div>
     );
