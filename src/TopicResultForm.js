@@ -2,9 +2,10 @@ import React, { useState, useEffect } from 'react';
 import './TopicResultForm.css';
 import config from './config';
 
-const TopicResultForm = ({ subjectName, subjectKey, lessonId, max, onSubmit, onCancel }) => {
+const TopicResultForm = ({ subjectName, subjectKey, lessonId, max, onSubmit, onCancel, expectedWrong, existingData }) => {
     const [topics, setTopics] = useState([]);
     const [loading, setLoading] = useState(true);
+    const [error, setError] = useState('');
 
     useEffect(() => {
         const fetchTopics = async () => {
@@ -13,12 +14,14 @@ const TopicResultForm = ({ subjectName, subjectKey, lessonId, max, onSubmit, onC
                 if (!response.ok) throw new Error("Sunucu hatası");
                 const data = await response.json();
 
-                const initialData = data.map(t => ({
-                    topicId: t.id,
-                    topicName: t.name,
-                    correct: 0,
-                    wrong: 0
-                }));
+                const initialData = data.map(t => {
+                    const existing = existingData?.find(e => parseInt(e.topicId) === t.id);
+                    return {
+                        topicId: t.id,
+                        topicName: t.name,
+                        wrong: existing ? String(existing.incorrectAnswers) : '' // 👈 eğer daha önce girildiyse yaz
+                    };
+                });
 
                 setTopics(initialData);
             } catch (error) {
@@ -30,43 +33,34 @@ const TopicResultForm = ({ subjectName, subjectKey, lessonId, max, onSubmit, onC
         };
 
         fetchTopics();
-    }, [lessonId]);
+    }, [lessonId, existingData]);
 
-    const handleChange = (index, field, value) => {
+    const handleChange = (index, value) => {
         const numeric = Math.max(0, parseInt(value) || 0);
         setTopics(prev => {
             const updated = [...prev];
-            updated[index][field] = numeric;
+            updated[index].wrong = value;
             return updated;
         });
+        setError('');
     };
 
-    const totalCorrect = topics.reduce((acc, t) => acc + t.correct, 0);
-    const totalWrong = topics.reduce((acc, t) => acc + t.wrong, 0);
-    const totalAnswered = totalCorrect + totalWrong;
-    const remainingBlank = Math.max(0, max - totalAnswered);
-
-    const blankPerTopic = Math.floor(remainingBlank / topics.length);
-    let extra = remainingBlank % topics.length;
-
-    const topicPayloads = topics.map((t, idx) => {
-        const distributedBlank = blankPerTopic + (extra > 0 ? 1 : 0);
-        if (extra > 0) extra--;
-
-        return {
-            topicId: String(t.topicId),
-            correctAnswers: t.correct,
-            incorrectAnswers: t.wrong,
-            blankAnswers: distributedBlank
-        };
-    });
+    const totalWrong = topics.reduce((acc, t) => acc + (parseInt(t.wrong) || 0), 0);
 
     const handleSubmit = () => {
+        if (totalWrong !== expectedWrong) {
+            setError(`❌ Toplam yanlış sayısı uyuşmuyor. Genel giriş: ${expectedWrong}, konu konu giriş: ${totalWrong}`);
+            return;
+        }
+
+        const topicPayloads = topics.map((t) => ({
+            topicId: String(t.topicId),
+            incorrectAnswers: parseInt(t.wrong) || 0,
+        }));
+
         onSubmit({
             subjectKey,
-            correct: totalCorrect,
             wrong: totalWrong,
-            empty: remainingBlank,
             topics: topicPayloads
         });
     };
@@ -80,48 +74,30 @@ const TopicResultForm = ({ subjectName, subjectKey, lessonId, max, onSubmit, onC
                 <thead>
                     <tr>
                         <th>Konu</th>
-                        <th>Doğru</th>
                         <th>Yanlış</th>
-                        <th>Boş</th>
                     </tr>
                 </thead>
                 <tbody>
-                    {topics.map((topic, index) => {
-                        const distributedBlank = topicPayloads.find(p => p.topicId === String(topic.topicId))?.blankAnswers || 0;
-                        return (
-                            <tr key={topic.topicId}>
-                                <td>{topic.topicName}</td>
-                                <td>
-                                    <input
-                                        type="number"
-                                        value={topic.correct}
-                                        onChange={(e) => handleChange(index, 'correct', e.target.value)}
-                                        min="0"
-                                    />
-                                </td>
-                                <td>
-                                    <input
-                                        type="number"
-                                        value={topic.wrong}
-                                        onChange={(e) => handleChange(index, 'wrong', e.target.value)}
-                                        min="0"
-                                    />
-                                </td>
-                                <td>
-                                    <input
-                                        type="number"
-                                        value={distributedBlank}
-                                        readOnly
-                                    />
-                                </td>
-                            </tr>
-                        );
-                    })}
+                    {topics.map((topic, index) => (
+                        <tr key={topic.topicId}>
+                            <td>{topic.topicName}</td>
+                            <td>
+                                <input
+                                    type="number"
+                                    value={topic.wrong}
+                                    onChange={(e) => handleChange(index, e.target.value)}
+                                    min="0"
+                                    placeholder="0"
+                                />
+                            </td>
+                        </tr>
+                    ))}
                 </tbody>
             </table>
 
             <div style={{ marginTop: "1rem" }}>
-                <p><b>Toplam:</b> {totalCorrect} Doğru, {totalWrong} Yanlış, {remainingBlank} Boş</p>
+                <p><b>Toplam Girilen Yanlış:</b> {totalWrong} / {expectedWrong}</p>
+                {error && <p style={{ color: 'red' }}>{error}</p>}
             </div>
 
             <div className="form-actions">
